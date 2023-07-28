@@ -1,5 +1,7 @@
 package teammates.ui.webapi;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +24,7 @@ class GetInstructorsAction extends Action {
     }
 
     @Override
-    void checkSpecificAccessControl() throws UnauthorizedAccessException {
+    void checkSpecificAccessControl() throws UnauthorizedAccessException, URISyntaxException, IOException, InterruptedException {
         if (userInfo.isAdmin) {
             return;
         }

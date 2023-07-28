@@ -1,5 +1,7 @@
 package teammates.logic.core;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -88,9 +90,12 @@ public final class AccountsLogic {
 
     /**
      * Joins the user as a student.
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      */
     public StudentAttributes joinCourseForStudent(String registrationKey, String googleId)
-            throws InvalidParametersException, EntityDoesNotExistException, EntityAlreadyExistsException {
+            throws InvalidParametersException, EntityDoesNotExistException, EntityAlreadyExistsException, URISyntaxException, IOException, InterruptedException {
         StudentAttributes student = validateStudentJoinRequest(registrationKey, googleId);
 
         // Register the student
@@ -114,9 +119,12 @@ public final class AccountsLogic {
     /**
      * Joins the user as an instructor and sets the institute if it is not null.
      * If the given institute is null, the instructor is given the institute of an existing instructor of the same course.
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      */
     public InstructorAttributes joinCourseForInstructor(String key, String googleId)
-            throws InvalidParametersException, EntityDoesNotExistException, EntityAlreadyExistsException {
+            throws InvalidParametersException, EntityDoesNotExistException, EntityAlreadyExistsException, URISyntaxException, IOException, InterruptedException {
         InstructorAttributes instructor = validateInstructorJoinRequest(key, googleId);
 
         // Register the instructor
@@ -159,7 +167,7 @@ public final class AccountsLogic {
     }
 
     private InstructorAttributes validateInstructorJoinRequest(String registrationKey, String googleId)
-            throws EntityDoesNotExistException, EntityAlreadyExistsException {
+            throws EntityDoesNotExistException, EntityAlreadyExistsException, URISyntaxException, IOException, InterruptedException {
         InstructorAttributes instructorForKey = instructorsLogic.getInstructorForRegistrationKey(registrationKey);
 
         if (instructorForKey == null) {
@@ -199,7 +207,7 @@ public final class AccountsLogic {
     }
 
     private StudentAttributes validateStudentJoinRequest(String registrationKey, String googleId)
-            throws EntityDoesNotExistException, EntityAlreadyExistsException {
+            throws EntityDoesNotExistException, EntityAlreadyExistsException, URISyntaxException, IOException, InterruptedException {
 
         StudentAttributes studentRole = studentsLogic.getStudentForRegistrationKey(registrationKey);
 
@@ -238,8 +246,11 @@ public final class AccountsLogic {
      * <ul>
      * <li>Fails silently if no such account.</li>
      * </ul>
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      */
-    public void deleteAccountCascade(String googleId) {
+    public void deleteAccountCascade(String googleId) throws URISyntaxException, IOException, InterruptedException {
         if (accountsDb.getAccount(googleId) == null) {
             return;
         }

@@ -1,6 +1,8 @@
 package teammates.ui.webapi;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
+import java.net.URISyntaxException;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -88,8 +90,11 @@ public abstract class Action {
 
     /**
      * Checks if the requesting user has sufficient authority to access the resource.
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      */
-    public void checkAccessControl() throws UnauthorizedAccessException {
+    public void checkAccessControl() throws UnauthorizedAccessException, URISyntaxException, IOException, InterruptedException {
         String userParam = getRequestParamValue(Const.ParamsNames.USER_ID);
         if (userInfo != null && userParam != null && !userInfo.isAdmin && !userInfo.id.equals(userParam)) {
             throw new UnauthorizedAccessException("User " + userInfo.id
@@ -319,12 +324,18 @@ public abstract class Action {
 
     /**
      * Checks the specific access control needs for the resource.
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      */
-    abstract void checkSpecificAccessControl() throws UnauthorizedAccessException;
+    abstract void checkSpecificAccessControl() throws UnauthorizedAccessException, URISyntaxException, IOException, InterruptedException;
 
     /**
      * Executes the action.
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws URISyntaxException
      */
-    public abstract ActionResult execute() throws InvalidHttpRequestBodyException, InvalidOperationException;
+    public abstract ActionResult execute() throws InvalidHttpRequestBodyException, InvalidOperationException, URISyntaxException, IOException, InterruptedException;
 
 }

@@ -1,5 +1,7 @@
 package teammates.ui.webapi;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import teammates.common.datatransfer.attributes.FeedbackQuestionAttributes;
@@ -67,15 +69,45 @@ class GetFeedbackQuestionsAction extends BasicFeedbackSubmissionAction {
             questions = logic.getFeedbackQuestionsForStudents(feedbackSessionName, courseId);
             StudentAttributes studentAttributes = getStudentOfCourseFromRequest(courseId);
             questions.forEach(question ->
-                    logic.populateFieldsToGenerateInQuestion(question,
-                            studentAttributes.getEmail(), studentAttributes.getTeam()));
+                    {
+                        try {
+                            try {
+                                logic.populateFieldsToGenerateInQuestion(question,
+                                        studentAttributes.getEmail(), studentAttributes.getTeam());
+                            } catch (IOException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            } catch (InterruptedException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                        } catch (URISyntaxException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    });
             break;
         case INSTRUCTOR_SUBMISSION:
             InstructorAttributes instructor = getInstructorOfCourseFromRequest(courseId);
             questions = logic.getFeedbackQuestionsForInstructors(feedbackSessionName, courseId, instructor.getEmail());
             questions.forEach(question ->
-                    logic.populateFieldsToGenerateInQuestion(question,
-                            instructor.getEmail(), null));
+                    {
+                        try {
+                            try {
+                                logic.populateFieldsToGenerateInQuestion(question,
+                                        instructor.getEmail(), null);
+                            } catch (IOException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            } catch (InterruptedException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                        } catch (URISyntaxException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    });
             break;
         case FULL_DETAIL:
         case INSTRUCTOR_RESULT:

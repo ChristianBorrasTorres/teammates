@@ -1,5 +1,7 @@
 package teammates.ui.webapi;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,7 +52,7 @@ class UpdateFeedbackSessionAction extends Action {
     }
 
     @Override
-    public JsonResult execute() throws InvalidHttpRequestBodyException {
+    public JsonResult execute() throws InvalidHttpRequestBodyException, URISyntaxException, IOException, InterruptedException {
         String courseId = getNonNullRequestParamValue(Const.ParamsNames.COURSE_ID);
         String feedbackSessionName = getNonNullRequestParamValue(Const.ParamsNames.FEEDBACK_SESSION_NAME);
 
@@ -154,7 +156,7 @@ class UpdateFeedbackSessionAction extends Action {
 
     private List<EmailWrapper> processDeadlineExtensions(String courseId, FeedbackSessionAttributes session,
             Map<String, Instant> oldDeadlines, Map<String, Instant> newDeadlines,
-            boolean areInstructors, boolean notifyUsers) {
+            boolean areInstructors, boolean notifyUsers) throws URISyntaxException, IOException, InterruptedException {
         if (oldDeadlines.equals(newDeadlines)) {
             return Collections.emptyList();
         }

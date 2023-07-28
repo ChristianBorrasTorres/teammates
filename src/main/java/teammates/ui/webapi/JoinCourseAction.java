@@ -1,5 +1,8 @@
 package teammates.ui.webapi;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 import org.apache.http.HttpStatus;
 
 import teammates.common.datatransfer.attributes.CourseAttributes;
@@ -30,7 +33,7 @@ class JoinCourseAction extends Action {
     }
 
     @Override
-    public JsonResult execute() throws InvalidOperationException {
+    public JsonResult execute() throws InvalidOperationException, URISyntaxException, IOException, InterruptedException {
         String regKey = getNonNullRequestParamValue(Const.ParamsNames.REGKEY);
         String entityType = getNonNullRequestParamValue(Const.ParamsNames.ENTITY_TYPE);
         switch (entityType) {
@@ -43,7 +46,7 @@ class JoinCourseAction extends Action {
         }
     }
 
-    private JsonResult joinCourseForStudent(String regkey) throws InvalidOperationException {
+    private JsonResult joinCourseForStudent(String regkey) throws InvalidOperationException, URISyntaxException, IOException, InterruptedException {
         StudentAttributes student;
 
         try {
@@ -63,7 +66,7 @@ class JoinCourseAction extends Action {
         return new JsonResult("Student successfully joined course");
     }
 
-    private JsonResult joinCourseForInstructor(String regkey) throws InvalidOperationException {
+    private JsonResult joinCourseForInstructor(String regkey) throws InvalidOperationException, URISyntaxException, IOException, InterruptedException {
         InstructorAttributes instructor;
 
         try {
@@ -83,7 +86,7 @@ class JoinCourseAction extends Action {
         return new JsonResult("Instructor successfully joined course");
     }
 
-    private void sendJoinEmail(String courseId, String userName, String userEmail, boolean isInstructor) {
+    private void sendJoinEmail(String courseId, String userName, String userEmail, boolean isInstructor) throws URISyntaxException, IOException, InterruptedException {
         CourseAttributes course = logic.getCourse(courseId);
         EmailWrapper email = emailGenerator.generateUserCourseRegisteredEmail(
                 userName, userEmail, userInfo.id, isInstructor, course);

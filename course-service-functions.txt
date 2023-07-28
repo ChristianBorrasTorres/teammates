@@ -1,0 +1,68 @@
+Funciones del microservicio Courses:
+
+
+1. Post-Course: 
+    > Crea un objeto curso con los siguientes Attributos:
+    
+    private Instant createdAt;
+    private Instant deletedAt;
+    private String name;
+    private String timeZone;
+    private String id;
+    private String institute;
+
+    > Debe retornar el curso creado.
+    > Debe retornar un error si el curso ya existe
+    > Debe retornar un error si los parámetros son inválidos
+
+----------------------------------------------------------------------
+2. Get-Course: 
+    > Retorna un curso específico
+    > Como parámetro se da el id del curso
+    > Si el curso no existe retorna null
+    
+----------------------------------------------------------------------
+3. Delete-Course: 
+    > Elimina un curso específico
+    > Como parámetro se da el id del curso
+    > Retorna un error en caso de que el curso no la id no existe
+
+----------------------------------------------------------------------
+4. Get-Courses: 
+    > Retorna una lista de cursos
+    > Como parametro se da un lista de Strings con los números de 
+    los cursos
+    > El método debe retornar una lista con objetos tipo curso
+    > Retorna un error en caso de que la lista de ids está vacía
+
+----------------------------------------------------------------------
+5. Put-Course: 
+    > Retorna el curso con los atributos cambiados
+    > Se da como parámetro un objeto con los siguientes atributos:
+        1. String id
+        2. String name;
+        3. String timeZone;
+        4. String institute;
+    > Los parámetros 2,3 y 4 son opcionales
+    > Retorna un error si los parámetros son null
+    > No hace nada si los parámetros son iguales que los atributos 
+    actuales
+
+----------------------------------------------------------------------
+6. Put-Soft-Delete: 
+    > Cambia el valor del atributo deletedAt
+    > Como parámetro se da el id del curso
+    > El atributo deletedAt recibe como valor la hora actual
+
+----------------------------------------------------------------------
+7. Put-Restore-Deleted-Course: 
+    > Cambia el valor del atributo deletedAt
+    > Como parámetro se da el id del curso
+    > El atributo deletedAt recibe como valor null
+
+----------------------------------------------------------------------
+8. Get-NumCoursesByTimeRange: 
+    > Como parámetros se dan dos valores de tipo Instant: 
+    startTime y endTime
+    > Retorna un int que representa el número de cursos creados dentro
+    de startTime y endTime

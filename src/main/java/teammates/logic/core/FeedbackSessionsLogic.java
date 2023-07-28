@@ -1,5 +1,7 @@
 package teammates.logic.core;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -128,7 +130,23 @@ public final class FeedbackSessionsLogic {
             List<InstructorAttributes> instructorList) {
 
         List<InstructorAttributes> courseNotDeletedInstructorList = instructorList.stream()
-                .filter(instructor -> !coursesLogic.getCourse(instructor.getCourseId()).isCourseDeleted())
+                .filter(instructor -> {
+                    try {
+                        try {
+                            return !coursesLogic.getCourse(instructor.getCourseId()).isCourseDeleted();
+                        } catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        } catch (InterruptedException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    } catch (URISyntaxException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    return false;
+                })
                 .collect(Collectors.toList());
 
         List<FeedbackSessionAttributes> fsList = new ArrayList<>();
@@ -149,7 +167,23 @@ public final class FeedbackSessionsLogic {
             List<InstructorAttributes> instructorList) {
 
         List<InstructorAttributes> courseNotDeletedInstructorList = instructorList.stream()
-                .filter(instructor -> !coursesLogic.getCourse(instructor.getCourseId()).isCourseDeleted())
+                .filter(instructor -> {
+                    try {
+                        try {
+                            return !coursesLogic.getCourse(instructor.getCourseId()).isCourseDeleted();
+                        } catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        } catch (InterruptedException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    } catch (URISyntaxException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    return false;
+                })
                 .collect(Collectors.toList());
 
         List<FeedbackSessionAttributes> fsList = new ArrayList<>();
@@ -167,8 +201,11 @@ public final class FeedbackSessionsLogic {
      *
      * @return returns a list of sessions that require automated emails to be
      *         sent as they are published
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      */
-    public List<FeedbackSessionAttributes> getFeedbackSessionsWhichNeedAutomatedPublishedEmailsToBeSent() {
+    public List<FeedbackSessionAttributes> getFeedbackSessionsWhichNeedAutomatedPublishedEmailsToBeSent() throws URISyntaxException, IOException, InterruptedException {
         List<FeedbackSessionAttributes> sessions = fsDb.getFeedbackSessionsPossiblyNeedingPublishedEmail();
         log.info(String.format("Number of sessions under consideration: %d", sessions.size()));
         List<FeedbackSessionAttributes> sessionsToSendEmailsFor = new ArrayList<>();
@@ -189,8 +226,11 @@ public final class FeedbackSessionsLogic {
     /**
      * Gets a list of undeleted feedback sessions which start within the last 2 hours
      * and need an open email to be sent.
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      */
-    public List<FeedbackSessionAttributes> getFeedbackSessionsWhichNeedOpenEmailsToBeSent() {
+    public List<FeedbackSessionAttributes> getFeedbackSessionsWhichNeedOpenEmailsToBeSent() throws URISyntaxException, IOException, InterruptedException {
         List<FeedbackSessionAttributes> sessions = fsDb.getFeedbackSessionsPossiblyNeedingOpenEmail();
         List<FeedbackSessionAttributes> sessionsToSendEmailsFor = new ArrayList<>();
         log.info(String.format("Number of sessions under consideration: %d", sessions.size()));
@@ -417,8 +457,11 @@ public final class FeedbackSessionsLogic {
 
     /**
      * Returns returns a list of sessions that are going to open in 24 hours.
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      */
-    public List<FeedbackSessionAttributes> getFeedbackSessionsOpeningWithinTimeLimit() {
+    public List<FeedbackSessionAttributes> getFeedbackSessionsOpeningWithinTimeLimit() throws URISyntaxException, IOException, InterruptedException {
         List<FeedbackSessionAttributes> requiredSessions = new ArrayList<>();
 
         List<FeedbackSessionAttributes> sessions = fsDb.getFeedbackSessionsPossiblyNeedingOpeningSoonEmail();
@@ -438,8 +481,11 @@ public final class FeedbackSessionsLogic {
 
     /**
      * Returns returns a list of sessions that are going to close within the next 24 hours.
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      */
-    public List<FeedbackSessionAttributes> getFeedbackSessionsClosingWithinTimeLimit() {
+    public List<FeedbackSessionAttributes> getFeedbackSessionsClosingWithinTimeLimit() throws URISyntaxException, IOException, InterruptedException {
         List<FeedbackSessionAttributes> requiredSessions = new ArrayList<>();
 
         List<FeedbackSessionAttributes> sessions = fsDb.getFeedbackSessionsPossiblyNeedingClosingEmail();
@@ -459,8 +505,11 @@ public final class FeedbackSessionsLogic {
 
     /**
      * Returns returns a list of sessions that were closed within past hour.
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      */
-    public List<FeedbackSessionAttributes> getFeedbackSessionsClosedWithinThePastHour() {
+    public List<FeedbackSessionAttributes> getFeedbackSessionsClosedWithinThePastHour() throws URISyntaxException, IOException, InterruptedException {
         List<FeedbackSessionAttributes> requiredSessions = new ArrayList<>();
         List<FeedbackSessionAttributes> sessions = fsDb.getFeedbackSessionsPossiblyNeedingClosedEmail();
         log.info(String.format("Number of sessions under consideration: %d", sessions.size()));

@@ -1,5 +1,7 @@
 package teammates.ui.webapi;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -43,7 +45,7 @@ class CreateAccountAction extends Action {
     }
 
     @Override
-    public JsonResult execute() throws InvalidHttpRequestBodyException, InvalidOperationException {
+    public JsonResult execute() throws InvalidHttpRequestBodyException, InvalidOperationException, URISyntaxException, IOException, InterruptedException {
         String registrationKey = getNonNullRequestParamValue(Const.ParamsNames.REGKEY);
         String timezone = getRequestParamValue(Const.ParamsNames.TIMEZONE);
 
@@ -115,9 +117,12 @@ class CreateAccountAction extends Action {
      * Imports demo course for the new instructor.
      *
      * @return the ID of demo course
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      */
     private String importDemoData(String instructorEmail, String instructorName, String instructorInstitute, String timezone)
-            throws InvalidParametersException {
+            throws InvalidParametersException, URISyntaxException, IOException, InterruptedException {
 
         String courseId = generateDemoCourseId(instructorEmail);
         Instant now = Instant.now();
@@ -198,8 +203,11 @@ class CreateAccountAction extends Action {
      *
      * @param instructorEmail is the instructor email.
      * @return generated course id
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      */
-    private String generateDemoCourseId(String instructorEmail) {
+    private String generateDemoCourseId(String instructorEmail) throws URISyntaxException, IOException, InterruptedException {
         String proposedCourseId = generateNextDemoCourseId(instructorEmail, FieldValidator.COURSE_ID_MAX_LENGTH);
         while (logic.getCourse(proposedCourseId) != null) {
             proposedCourseId = generateNextDemoCourseId(proposedCourseId, FieldValidator.COURSE_ID_MAX_LENGTH);

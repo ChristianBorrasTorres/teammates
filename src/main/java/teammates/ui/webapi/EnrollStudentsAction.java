@@ -1,5 +1,7 @@
 package teammates.ui.webapi;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -35,7 +37,7 @@ class EnrollStudentsAction extends Action {
     }
 
     @Override
-    void checkSpecificAccessControl() throws UnauthorizedAccessException {
+    void checkSpecificAccessControl() throws UnauthorizedAccessException, URISyntaxException, IOException, InterruptedException {
         if (!userInfo.isInstructor) {
             throw new UnauthorizedAccessException("Instructor privilege is required to access this resource.");
         }

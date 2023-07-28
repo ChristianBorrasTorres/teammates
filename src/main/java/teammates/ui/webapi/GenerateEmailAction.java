@@ -1,5 +1,7 @@
 package teammates.ui.webapi;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -17,7 +19,7 @@ import teammates.ui.output.EmailData;
 class GenerateEmailAction extends AdminOnlyAction {
 
     @Override
-    public JsonResult execute() {
+    public JsonResult execute() throws URISyntaxException, IOException, InterruptedException {
         String courseId = getNonNullRequestParamValue(Const.ParamsNames.COURSE_ID);
         CourseAttributes course = logic.getCourse(courseId);
         if (course == null) {

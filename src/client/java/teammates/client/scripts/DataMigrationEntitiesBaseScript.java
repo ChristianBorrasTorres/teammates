@@ -3,6 +3,7 @@ package teammates.client.scripts;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -80,8 +81,11 @@ public abstract class DataMigrationEntitiesBaseScript<T extends BaseEntity> exte
      * Checks whether data migration is needed.
      *
      * <p>Causation: this method might be called in multiple threads if using transaction.</p>
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws URISyntaxException
      */
-    protected abstract boolean isMigrationNeeded(T entity);
+    protected abstract boolean isMigrationNeeded(T entity) throws URISyntaxException, IOException, InterruptedException;
 
     /**
      * Migrates the entity.

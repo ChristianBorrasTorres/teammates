@@ -1,5 +1,7 @@
 package teammates.ui.webapi;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -84,7 +86,7 @@ class SubmitFeedbackResponsesAction extends BasicFeedbackSubmissionAction {
     }
 
     @Override
-    public JsonResult execute() throws InvalidHttpRequestBodyException, InvalidOperationException {
+    public JsonResult execute() throws InvalidHttpRequestBodyException, InvalidOperationException, URISyntaxException, IOException, InterruptedException {
         String feedbackQuestionId = getNonNullRequestParamValue(Const.ParamsNames.FEEDBACK_QUESTION_ID);
         FeedbackQuestionAttributes feedbackQuestion = logic.getFeedbackQuestion(feedbackQuestionId);
         if (feedbackQuestion == null) {

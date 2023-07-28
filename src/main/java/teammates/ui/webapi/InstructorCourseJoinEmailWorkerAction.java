@@ -1,5 +1,8 @@
 package teammates.ui.webapi;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 import teammates.common.datatransfer.attributes.AccountAttributes;
 import teammates.common.datatransfer.attributes.CourseAttributes;
 import teammates.common.datatransfer.attributes.InstructorAttributes;
@@ -12,7 +15,7 @@ import teammates.common.util.EmailWrapper;
 class InstructorCourseJoinEmailWorkerAction extends AdminOnlyAction {
 
     @Override
-    public JsonResult execute() {
+    public JsonResult execute() throws URISyntaxException, IOException, InterruptedException {
         String courseId = getNonNullRequestParamValue(ParamsNames.COURSE_ID);
         CourseAttributes course = logic.getCourse(courseId);
         if (course == null) {

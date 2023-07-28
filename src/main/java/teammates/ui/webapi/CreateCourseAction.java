@@ -1,5 +1,7 @@
 package teammates.ui.webapi;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 
@@ -35,7 +37,23 @@ class CreateCourseAction extends Action {
         boolean canCreateCourse = existingInstructors
                 .stream()
                 .filter(InstructorAttributes::hasCoownerPrivileges)
-                .map(instructor -> logic.getCourse(instructor.getCourseId()))
+                .map(instructor -> {
+                    try {
+                        try {
+                            return logic.getCourse(instructor.getCourseId());
+                        } catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        } catch (InterruptedException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    } catch (URISyntaxException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    return null;
+                })
                 .filter(Objects::nonNull)
                 .anyMatch(course -> institute.equals(course.getInstitute()));
         if (!canCreateCourse) {
@@ -45,7 +63,7 @@ class CreateCourseAction extends Action {
     }
 
     @Override
-    public JsonResult execute() throws InvalidHttpRequestBodyException, InvalidOperationException {
+    public JsonResult execute() throws InvalidHttpRequestBodyException, InvalidOperationException, URISyntaxException, IOException, InterruptedException {
         CourseCreateRequest courseCreateRequest = getAndValidateRequestBody(CourseCreateRequest.class);
         courseCreateRequest.setCourseId(courseCreateRequest.getCourseId().trim());
 

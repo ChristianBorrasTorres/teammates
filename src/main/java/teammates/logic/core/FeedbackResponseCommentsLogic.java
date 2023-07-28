@@ -1,5 +1,7 @@
 package teammates.logic.core;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
@@ -59,9 +61,12 @@ public final class FeedbackResponseCommentsLogic {
      *
      * <p>If the comment is given by feedback participant, ownership of the corresponding response
      * of the comment is not checked.</p>
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      */
     public FeedbackResponseCommentAttributes createFeedbackResponseComment(FeedbackResponseCommentAttributes frComment)
-            throws InvalidParametersException, EntityDoesNotExistException, EntityAlreadyExistsException {
+            throws InvalidParametersException, EntityDoesNotExistException, EntityAlreadyExistsException, URISyntaxException, IOException, InterruptedException {
         verifyIsCoursePresent(frComment.getCourseId());
         verifyIsUserOfCourse(frComment.getCourseId(), frComment.getCommentGiver(), frComment.getCommentGiverType(),
                 frComment.isCommentFromFeedbackParticipant());
@@ -375,9 +380,12 @@ public final class FeedbackResponseCommentsLogic {
      * @param courseId id of course
      * @param commentGiver person/team who gave comment
      * @param commentGiverType type of comment giver
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      */
     private void verifyIsUserOfCourse(String courseId, String commentGiver, FeedbackParticipantType commentGiverType,
-            boolean isCommentFromFeedbackParticipant) throws EntityDoesNotExistException {
+            boolean isCommentFromFeedbackParticipant) throws EntityDoesNotExistException, URISyntaxException, IOException, InterruptedException {
         if (!isCommentFromFeedbackParticipant) {
             InstructorAttributes instructor = instructorsLogic.getInstructorForEmail(courseId, commentGiver);
             if (instructor == null) {

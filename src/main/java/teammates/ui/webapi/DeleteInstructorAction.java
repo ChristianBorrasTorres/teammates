@@ -1,5 +1,7 @@
 package teammates.ui.webapi;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import teammates.common.datatransfer.attributes.InstructorAttributes;
@@ -16,7 +18,7 @@ class DeleteInstructorAction extends Action {
     }
 
     @Override
-    void checkSpecificAccessControl() throws UnauthorizedAccessException {
+    void checkSpecificAccessControl() throws UnauthorizedAccessException, URISyntaxException, IOException, InterruptedException {
         //allow access to admins or instructor with modify permission
         if (userInfo.isAdmin) {
             return;

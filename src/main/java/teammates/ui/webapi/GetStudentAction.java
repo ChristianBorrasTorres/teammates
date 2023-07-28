@@ -1,5 +1,8 @@
 package teammates.ui.webapi;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 import teammates.common.datatransfer.attributes.CourseAttributes;
 import teammates.common.datatransfer.attributes.InstructorAttributes;
 import teammates.common.datatransfer.attributes.StudentAttributes;
@@ -23,7 +26,7 @@ class GetStudentAction extends Action {
     }
 
     @Override
-    void checkSpecificAccessControl() throws UnauthorizedAccessException {
+    void checkSpecificAccessControl() throws UnauthorizedAccessException, URISyntaxException, IOException, InterruptedException {
         String courseId = getNonNullRequestParamValue(Const.ParamsNames.COURSE_ID);
         CourseAttributes course = logic.getCourse(courseId);
 
@@ -54,7 +57,7 @@ class GetStudentAction extends Action {
     }
 
     @Override
-    public JsonResult execute() {
+    public JsonResult execute() throws URISyntaxException, IOException, InterruptedException {
         String courseId = getNonNullRequestParamValue(Const.ParamsNames.COURSE_ID);
         StudentAttributes student;
 

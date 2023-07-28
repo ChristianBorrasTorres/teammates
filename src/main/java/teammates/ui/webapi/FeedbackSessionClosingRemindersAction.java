@@ -1,5 +1,7 @@
 package teammates.ui.webapi;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
@@ -22,7 +24,7 @@ class FeedbackSessionClosingRemindersAction extends AdminOnlyAction {
     private static final Logger log = Logger.getLogger();
 
     @Override
-    public JsonResult execute() {
+    public JsonResult execute() throws URISyntaxException, IOException, InterruptedException {
         List<FeedbackSessionAttributes> sessions = logic.getFeedbackSessionsClosingWithinTimeLimit();
 
         for (FeedbackSessionAttributes session : sessions) {

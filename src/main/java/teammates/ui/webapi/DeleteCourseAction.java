@@ -1,5 +1,8 @@
 package teammates.ui.webapi;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 import teammates.common.util.Const;
 import teammates.ui.output.MessageOutput;
 
@@ -14,7 +17,7 @@ class DeleteCourseAction extends Action {
     }
 
     @Override
-    void checkSpecificAccessControl() throws UnauthorizedAccessException {
+    void checkSpecificAccessControl() throws UnauthorizedAccessException, URISyntaxException, IOException, InterruptedException {
         if (!userInfo.isInstructor) {
             throw new UnauthorizedAccessException("Instructor privilege is required to access this resource.");
         }
@@ -25,7 +28,7 @@ class DeleteCourseAction extends Action {
     }
 
     @Override
-    public JsonResult execute() {
+    public JsonResult execute() throws URISyntaxException, IOException, InterruptedException {
         String idOfCourseToDelete = getNonNullRequestParamValue(Const.ParamsNames.COURSE_ID);
 
         logic.deleteCourseCascade(idOfCourseToDelete);

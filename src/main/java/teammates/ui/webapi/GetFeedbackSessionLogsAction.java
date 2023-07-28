@@ -1,5 +1,7 @@
 package teammates.ui.webapi;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -27,7 +29,7 @@ public class GetFeedbackSessionLogsAction extends Action {
     }
 
     @Override
-    void checkSpecificAccessControl() throws UnauthorizedAccessException {
+    void checkSpecificAccessControl() throws UnauthorizedAccessException, URISyntaxException, IOException, InterruptedException {
         if (!userInfo.isInstructor) {
             throw new UnauthorizedAccessException("Instructor privilege is required to access this resource.");
         }
@@ -46,7 +48,7 @@ public class GetFeedbackSessionLogsAction extends Action {
     }
 
     @Override
-    public JsonResult execute() {
+    public JsonResult execute() throws URISyntaxException, IOException, InterruptedException {
         String courseId = getNonNullRequestParamValue(Const.ParamsNames.COURSE_ID);
         if (logic.getCourse(courseId) == null) {
             throw new EntityNotFoundException("Course not found");

@@ -1,5 +1,8 @@
 package teammates.ui.webapi;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 import org.apache.http.HttpStatus;
 
 import teammates.common.datatransfer.attributes.InstructorAttributes;
@@ -32,7 +35,7 @@ class RegenerateInstructorKeyAction extends AdminOnlyAction {
             SUCCESSFUL_REGENERATION + " but the email failed to send.";
 
     @Override
-    public JsonResult execute() {
+    public JsonResult execute() throws URISyntaxException, IOException, InterruptedException {
         String instructorEmailAddress = getNonNullRequestParamValue(Const.ParamsNames.INSTRUCTOR_EMAIL);
         String courseId = getNonNullRequestParamValue(Const.ParamsNames.COURSE_ID);
 
@@ -57,8 +60,11 @@ class RegenerateInstructorKeyAction extends AdminOnlyAction {
     /**
      * Sends the regenerated course join and feedback session links to the instructor.
      * @return true if the email was sent successfully, and false otherwise.
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws URISyntaxException
      */
-    private boolean sendEmail(InstructorAttributes instructor) {
+    private boolean sendEmail(InstructorAttributes instructor) throws URISyntaxException, IOException, InterruptedException {
         EmailWrapper email = emailGenerator.generateFeedbackSessionSummaryOfCourse(
                 instructor.getCourseId(), instructor.getEmail(), EmailType.INSTRUCTOR_COURSE_LINKS_REGENERATED);
         EmailSendingStatus status = emailSender.sendEmail(email);

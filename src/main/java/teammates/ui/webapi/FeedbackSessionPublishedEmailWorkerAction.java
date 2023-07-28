@@ -1,5 +1,7 @@
 package teammates.ui.webapi;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import teammates.common.datatransfer.attributes.FeedbackSessionAttributes;
@@ -15,7 +17,7 @@ class FeedbackSessionPublishedEmailWorkerAction extends AdminOnlyAction {
     private static final Logger log = Logger.getLogger();
 
     @Override
-    public JsonResult execute() {
+    public JsonResult execute() throws URISyntaxException, IOException, InterruptedException {
         String feedbackSessionName = getNonNullRequestParamValue(ParamsNames.FEEDBACK_SESSION_NAME);
         String courseId = getNonNullRequestParamValue(ParamsNames.COURSE_ID);
 

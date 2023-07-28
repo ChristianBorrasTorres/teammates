@@ -1,5 +1,8 @@
 package teammates.ui.webapi;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 import teammates.common.datatransfer.attributes.CourseAttributes;
 import teammates.common.exception.EntityDoesNotExistException;
 import teammates.common.util.Const;
@@ -16,7 +19,7 @@ class BinCourseAction extends Action {
     }
 
     @Override
-    void checkSpecificAccessControl() throws UnauthorizedAccessException {
+    void checkSpecificAccessControl() throws UnauthorizedAccessException, URISyntaxException, IOException, InterruptedException {
         if (!userInfo.isInstructor) {
             throw new UnauthorizedAccessException("Instructor privilege is required to access this resource.");
         }
@@ -27,7 +30,7 @@ class BinCourseAction extends Action {
     }
 
     @Override
-    public JsonResult execute() {
+    public JsonResult execute() throws URISyntaxException, IOException, InterruptedException {
         String idOfCourseToBin = getNonNullRequestParamValue(Const.ParamsNames.COURSE_ID);
         try {
             CourseAttributes courseAttributes = logic.getCourse(idOfCourseToBin);

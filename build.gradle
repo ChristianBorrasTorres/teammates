@@ -71,6 +71,8 @@ dependencies {
     implementation("org.eclipse.jetty:jetty-webapp")
     implementation("org.eclipse.jetty:jetty-annotations")
     implementation("org.jsoup:jsoup:1.15.2")
+    implementation('com.fasterxml.jackson.core:jackson-databind:2.15.1')
+    implementation('com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.1')
 
     testAnnotationProcessor(testng)
 

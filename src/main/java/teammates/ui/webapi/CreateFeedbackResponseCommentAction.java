@@ -1,5 +1,8 @@
 package teammates.ui.webapi;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 import teammates.common.datatransfer.FeedbackParticipantType;
 import teammates.common.datatransfer.attributes.FeedbackQuestionAttributes;
 import teammates.common.datatransfer.attributes.FeedbackResponseAttributes;
@@ -100,7 +103,7 @@ class CreateFeedbackResponseCommentAction extends BasicCommentSubmissionAction {
     }
 
     @Override
-    public JsonResult execute() throws InvalidHttpRequestBodyException, InvalidOperationException {
+    public JsonResult execute() throws InvalidHttpRequestBodyException, InvalidOperationException, URISyntaxException, IOException, InterruptedException {
         String feedbackResponseId;
         try {
             feedbackResponseId = StringHelper.decrypt(

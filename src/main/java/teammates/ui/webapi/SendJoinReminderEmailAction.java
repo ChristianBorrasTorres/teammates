@@ -1,5 +1,7 @@
 package teammates.ui.webapi;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import teammates.common.datatransfer.attributes.CourseAttributes;
@@ -18,7 +20,7 @@ class SendJoinReminderEmailAction extends Action {
     }
 
     @Override
-    void checkSpecificAccessControl() throws UnauthorizedAccessException {
+    void checkSpecificAccessControl() throws UnauthorizedAccessException, URISyntaxException, IOException, InterruptedException {
         String courseId = getNonNullRequestParamValue(Const.ParamsNames.COURSE_ID);
 
         CourseAttributes course = logic.getCourse(courseId);
@@ -44,7 +46,7 @@ class SendJoinReminderEmailAction extends Action {
     }
 
     @Override
-    public JsonResult execute() {
+    public JsonResult execute() throws URISyntaxException, IOException, InterruptedException {
         String courseId = getNonNullRequestParamValue(Const.ParamsNames.COURSE_ID);
 
         CourseAttributes course = logic.getCourse(courseId);

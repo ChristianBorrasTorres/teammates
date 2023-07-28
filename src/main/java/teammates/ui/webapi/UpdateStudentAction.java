@@ -1,5 +1,7 @@
 package teammates.ui.webapi;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 
 import teammates.common.datatransfer.attributes.InstructorAttributes;
@@ -32,7 +34,7 @@ class UpdateStudentAction extends Action {
     }
 
     @Override
-    void checkSpecificAccessControl() throws UnauthorizedAccessException {
+    void checkSpecificAccessControl() throws UnauthorizedAccessException, URISyntaxException, IOException, InterruptedException {
         if (!userInfo.isInstructor) {
             throw new UnauthorizedAccessException("Instructor privilege is required to access this resource.");
         }
@@ -44,7 +46,7 @@ class UpdateStudentAction extends Action {
     }
 
     @Override
-    public JsonResult execute() throws InvalidHttpRequestBodyException, InvalidOperationException {
+    public JsonResult execute() throws InvalidHttpRequestBodyException, InvalidOperationException, URISyntaxException, IOException, InterruptedException {
         String courseId = getNonNullRequestParamValue(Const.ParamsNames.COURSE_ID);
         String studentEmail = getNonNullRequestParamValue(Const.ParamsNames.STUDENT_EMAIL);
 
@@ -106,8 +108,11 @@ class UpdateStudentAction extends Action {
      * Sends the feedback session summary as an email.
      *
      * @return The true if email was sent successfully or false otherwise.
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws URISyntaxException
      */
-    private boolean sendEmail(String courseId, String studentEmail) {
+    private boolean sendEmail(String courseId, String studentEmail) throws URISyntaxException, IOException, InterruptedException {
         EmailWrapper email = emailGenerator.generateFeedbackSessionSummaryOfCourse(
                 courseId, studentEmail, EmailType.STUDENT_EMAIL_CHANGED);
         EmailSendingStatus status = emailSender.sendEmail(email);

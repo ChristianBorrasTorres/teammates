@@ -1,5 +1,7 @@
 package teammates.logic.api;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -74,13 +76,16 @@ public final class EmailGenerator {
 
     /**
      * Generates the feedback session opening emails for the given {@code session}.
+ * @throws URISyntaxException
+ * @throws InterruptedException
+ * @throws IOException
      */
-    public List<EmailWrapper> generateFeedbackSessionOpeningEmails(FeedbackSessionAttributes session) {
+    public List<EmailWrapper> generateFeedbackSessionOpeningEmails(FeedbackSessionAttributes session) throws URISyntaxException, IOException, InterruptedException {
         return generateFeedbackSessionOpeningOrClosingEmails(session, EmailType.FEEDBACK_OPENING);
     }
 
     private List<EmailWrapper> generateFeedbackSessionOpeningOrClosingEmails(
-            FeedbackSessionAttributes session, EmailType emailType) {
+            FeedbackSessionAttributes session, EmailType emailType) throws URISyntaxException, IOException, InterruptedException {
         CourseAttributes course = coursesLogic.getCourse(session.getCourseId());
         boolean isEmailNeededForStudents = fsLogic.isFeedbackSessionForUserTypeToAnswer(session, false);
         boolean isEmailNeededForInstructors = fsLogic.isFeedbackSessionForUserTypeToAnswer(session, true);
@@ -122,13 +127,16 @@ public final class EmailGenerator {
      * Generates the feedback session opening soon emails for the given {@code session}.
      *
      * <p>This is useful for e.g. in case the feedback session opening info was set wrongly.
+ * @throws URISyntaxException
+ * @throws InterruptedException
+ * @throws IOException
      */
-    public List<EmailWrapper> generateFeedbackSessionOpeningSoonEmails(FeedbackSessionAttributes session) {
+    public List<EmailWrapper> generateFeedbackSessionOpeningSoonEmails(FeedbackSessionAttributes session) throws URISyntaxException, IOException, InterruptedException {
         return generateFeedbackSessionOpeningSoonOrClosedEmails(session, EmailType.FEEDBACK_OPENING_SOON);
     }
 
     private List<EmailWrapper> generateFeedbackSessionOpeningSoonOrClosedEmails(
-            FeedbackSessionAttributes session, EmailType emailType) {
+            FeedbackSessionAttributes session, EmailType emailType) throws URISyntaxException, IOException, InterruptedException {
         CourseAttributes course = coursesLogic.getCourse(session.getCourseId());
         // Notify only course co-owners
         List<InstructorAttributes> coOwners = instructorsLogic.getCoOwnersForCourse(session.getCourseId());
@@ -217,10 +225,13 @@ public final class EmailGenerator {
     /**
      * Generates the feedback session reminder emails for the given {@code session} for {@code students}
      * and {@code instructorsToRemind}. In addition, the emails will also be forwarded to {@code instructorsToNotify}.
+ * @throws InterruptedException
+ * @throws IOException
+ * @throws URISyntaxException
      */
     public List<EmailWrapper> generateFeedbackSessionReminderEmails(
             FeedbackSessionAttributes session, List<StudentAttributes> students,
-            List<InstructorAttributes> instructorsToRemind, InstructorAttributes instructorToNotify) {
+            List<InstructorAttributes> instructorsToRemind, InstructorAttributes instructorToNotify) throws URISyntaxException, IOException, InterruptedException {
 
         CourseAttributes course = coursesLogic.getCourse(session.getCourseId());
         String template = EmailTemplates.USER_FEEDBACK_SESSION.replace("${status}", FEEDBACK_STATUS_SESSION_OPEN);
@@ -239,9 +250,12 @@ public final class EmailGenerator {
      * @param courseId - ID of the course
      * @param userEmail - Email of student to send feedback session summary to
      * @param emailType - The email type which corresponds to the reason behind why the links are being resent
+ * @throws InterruptedException
+ * @throws IOException
+ * @throws URISyntaxException
      */
     public EmailWrapper generateFeedbackSessionSummaryOfCourse(
-            String courseId, String userEmail, EmailType emailType) {
+            String courseId, String userEmail, EmailType emailType) throws URISyntaxException, IOException, InterruptedException {
         assert emailType == EmailType.STUDENT_EMAIL_CHANGED
                 || emailType == EmailType.STUDENT_COURSE_LINKS_REGENERATED
                 || emailType == EmailType.INSTRUCTOR_COURSE_LINKS_REGENERATED;
@@ -351,8 +365,11 @@ public final class EmailGenerator {
      * under {@code recoveryEmailAddress} in the past 180 days. If no student with {@code recoveryEmailAddress} is
      * found, generate an email stating that there is no such student in the system. If no feedback sessions are found,
      * generate an email stating no feedback sessions found.
+ * @throws InterruptedException
+ * @throws IOException
+ * @throws URISyntaxException
      */
-    public EmailWrapper generateSessionLinksRecoveryEmailForStudent(String recoveryEmailAddress) {
+    public EmailWrapper generateSessionLinksRecoveryEmailForStudent(String recoveryEmailAddress) throws URISyntaxException, IOException, InterruptedException {
         List<StudentAttributes> studentsForEmail = studentsLogic.getAllStudentsForEmail(recoveryEmailAddress);
 
         if (studentsForEmail.isEmpty()) {
@@ -378,7 +395,7 @@ public final class EmailGenerator {
     }
 
     private EmailWrapper generateSessionLinksRecoveryEmailForExistingStudent(String recoveryEmailAddress,
-                                                                             List<StudentAttributes> studentsForEmail) {
+                                                                             List<StudentAttributes> studentsForEmail) throws URISyntaxException, IOException, InterruptedException {
         String emailBody;
 
         var searchStartTime = TimeHelper.getInstantDaysOffsetBeforeNow(SESSION_LINK_RECOVERY_DURATION_IN_DAYS);
@@ -449,11 +466,24 @@ public final class EmailGenerator {
         } else {
             var courseFragments = new StringBuilder(10000);
             linkFragmentsMap.forEach((courseId, linksFragments) -> {
-                String courseBody = Templates.populateTemplate(
-                        EmailTemplates.FRAGMENT_SESSION_LINKS_RECOVERY_ACCESS_LINKS_BY_COURSE,
-                        "${sessionFragment}", linksFragments.toString(),
-                        "${courseName}", coursesLogic.getCourse(courseId).getName());
-                courseFragments.append(courseBody);
+                String courseBody;
+                try {
+                        courseBody = Templates.populateTemplate(
+                                EmailTemplates.FRAGMENT_SESSION_LINKS_RECOVERY_ACCESS_LINKS_BY_COURSE,
+                                "${sessionFragment}", linksFragments.toString(),
+                                "${courseName}", coursesLogic.getCourse(courseId).getName());
+                                courseFragments.append(courseBody);
+                } catch (URISyntaxException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                } catch (InterruptedException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                }
+                
             });
             emailBody = Templates.populateTemplate(
                     EmailTemplates.SESSION_LINKS_RECOVERY_ACCESS_LINKS,
@@ -476,23 +506,32 @@ public final class EmailGenerator {
      * Generates the feedback session closing emails for the given {@code session}.
      *
      * <p>Students and instructors with deadline extensions are not notified.
+ * @throws InterruptedException
+ * @throws IOException
+ * @throws URISyntaxException
      */
-    public List<EmailWrapper> generateFeedbackSessionClosingEmails(FeedbackSessionAttributes session) {
+    public List<EmailWrapper> generateFeedbackSessionClosingEmails(FeedbackSessionAttributes session) throws URISyntaxException, IOException, InterruptedException {
         return generateFeedbackSessionOpeningOrClosingEmails(session, EmailType.FEEDBACK_CLOSING);
     }
 
     /**
      * Generates the feedback session closed emails for the given {@code session}.
+ * @throws InterruptedException
+ * @throws IOException
+ * @throws URISyntaxException
      */
-    public List<EmailWrapper> generateFeedbackSessionClosedEmails(FeedbackSessionAttributes session) {
+    public List<EmailWrapper> generateFeedbackSessionClosedEmails(FeedbackSessionAttributes session) throws URISyntaxException, IOException, InterruptedException {
         return generateFeedbackSessionOpeningSoonOrClosedEmails(session, EmailType.FEEDBACK_CLOSED);
     }
 
     /**
     * Generates the feedback session closing emails for users with deadline extensions.
+ * @throws InterruptedException
+ * @throws IOException
+ * @throws URISyntaxException
     */
     public List<EmailWrapper> generateFeedbackSessionClosingWithExtensionEmails(
-            FeedbackSessionAttributes session, List<DeadlineExtensionAttributes> deadlineExtensions) {
+            FeedbackSessionAttributes session, List<DeadlineExtensionAttributes> deadlineExtensions) throws URISyntaxException, IOException, InterruptedException {
         String courseId = session.getCourseId();
         CourseAttributes course = coursesLogic.getCourse(courseId);
         List<DeadlineExtensionAttributes> studentDeadlines =
@@ -545,31 +584,40 @@ public final class EmailGenerator {
 
     /**
      * Generates the feedback session published emails for the given {@code session}.
+ * @throws InterruptedException
+ * @throws IOException
+ * @throws URISyntaxException
      */
-    public List<EmailWrapper> generateFeedbackSessionPublishedEmails(FeedbackSessionAttributes session) {
+    public List<EmailWrapper> generateFeedbackSessionPublishedEmails(FeedbackSessionAttributes session) throws URISyntaxException, IOException, InterruptedException {
         return generateFeedbackSessionPublishedOrUnpublishedEmails(session, EmailType.FEEDBACK_PUBLISHED);
     }
 
     /**
      * Generates the feedback session published emails for the given {@code students} and
      * {@code instructors} in {@code session}.
+ * @throws InterruptedException
+ * @throws IOException
+ * @throws URISyntaxException
      */
     public List<EmailWrapper> generateFeedbackSessionPublishedEmails(FeedbackSessionAttributes session,
             List<StudentAttributes> students, List<InstructorAttributes> instructors,
-            List<InstructorAttributes> instructorsToNotify) {
+            List<InstructorAttributes> instructorsToNotify) throws URISyntaxException, IOException, InterruptedException {
         return generateFeedbackSessionPublishedOrUnpublishedEmails(
                 session, students, instructors, instructorsToNotify, EmailType.FEEDBACK_PUBLISHED);
     }
 
     /**
      * Generates the feedback session unpublished emails for the given {@code session}.
+ * @throws InterruptedException
+ * @throws IOException
+ * @throws URISyntaxException
      */
-    public List<EmailWrapper> generateFeedbackSessionUnpublishedEmails(FeedbackSessionAttributes session) {
+    public List<EmailWrapper> generateFeedbackSessionUnpublishedEmails(FeedbackSessionAttributes session) throws URISyntaxException, IOException, InterruptedException {
         return generateFeedbackSessionPublishedOrUnpublishedEmails(session, EmailType.FEEDBACK_UNPUBLISHED);
     }
 
     private List<EmailWrapper> generateFeedbackSessionPublishedOrUnpublishedEmails(
-            FeedbackSessionAttributes session, EmailType emailType) {
+            FeedbackSessionAttributes session, EmailType emailType) throws URISyntaxException, IOException, InterruptedException {
         boolean isEmailNeededForStudents = fsLogic.isFeedbackSessionViewableToUserType(session, false);
         boolean isEmailNeededForInstructors = fsLogic.isFeedbackSessionViewableToUserType(session, true);
         List<InstructorAttributes> instructorsToNotify = isEmailNeededForStudents
@@ -588,7 +636,7 @@ public final class EmailGenerator {
 
     private List<EmailWrapper> generateFeedbackSessionPublishedOrUnpublishedEmails(
             FeedbackSessionAttributes session, List<StudentAttributes> students,
-            List<InstructorAttributes> instructors, List<InstructorAttributes> instructorsToNotify, EmailType emailType) {
+            List<InstructorAttributes> instructors, List<InstructorAttributes> instructorsToNotify, EmailType emailType) throws URISyntaxException, IOException, InterruptedException {
         CourseAttributes course = coursesLogic.getCourse(session.getCourseId());
         String template;
         String action;

@@ -1,5 +1,7 @@
 package teammates.ui.webapi;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +17,7 @@ import teammates.ui.output.InstructorsData;
 class SearchInstructorsAction extends AdminOnlyAction {
 
     @Override
-    public JsonResult execute() {
+    public JsonResult execute() throws URISyntaxException, IOException, InterruptedException {
         String searchKey = getNonNullRequestParamValue(Const.ParamsNames.SEARCH_KEY);
         List<InstructorAttributes> instructors;
         try {

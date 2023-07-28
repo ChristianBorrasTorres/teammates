@@ -1,5 +1,7 @@
 package teammates.ui.webapi;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +24,7 @@ class GetHasResponsesAction extends Action {
     }
 
     @Override
-    void checkSpecificAccessControl() throws UnauthorizedAccessException {
+    void checkSpecificAccessControl() throws UnauthorizedAccessException, URISyntaxException, IOException, InterruptedException {
 
         String entityType = getNonNullRequestParamValue(Const.ParamsNames.ENTITY_TYPE);
 
@@ -83,7 +85,7 @@ class GetHasResponsesAction extends Action {
     }
 
     @Override
-    public JsonResult execute() {
+    public JsonResult execute() throws URISyntaxException, IOException, InterruptedException {
         String entityType = getNonNullRequestParamValue(Const.ParamsNames.ENTITY_TYPE);
 
         if (entityType.equals(Const.EntityType.INSTRUCTOR)) {
@@ -118,7 +120,7 @@ class GetHasResponsesAction extends Action {
                 logic.isFeedbackSessionAttemptedByStudent(feedbackSession, student.getEmail(), student.getTeam())));
     }
 
-    private JsonResult handleInstructorReq() {
+    private JsonResult handleInstructorReq() throws URISyntaxException, IOException, InterruptedException {
         String feedbackQuestionID = getRequestParamValue(Const.ParamsNames.FEEDBACK_QUESTION_ID);
         if (feedbackQuestionID != null) {
             if (logic.getFeedbackQuestion(feedbackQuestionID) == null) {

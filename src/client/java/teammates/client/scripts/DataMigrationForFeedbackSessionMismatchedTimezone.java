@@ -1,5 +1,7 @@
 package teammates.client.scripts;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.ZoneId;
 
@@ -35,7 +37,7 @@ public class DataMigrationForFeedbackSessionMismatchedTimezone extends DataMigra
     }
 
     @Override
-    protected boolean isMigrationNeeded(FeedbackSession session) {
+    protected boolean isMigrationNeeded(FeedbackSession session) throws URISyntaxException, IOException, InterruptedException {
         if (!session.getCourseId().equals(currentCourseId)) {
             currentCourseId = session.getCourseId();
             currentCourse = coursesLogic.getCourse(currentCourseId);

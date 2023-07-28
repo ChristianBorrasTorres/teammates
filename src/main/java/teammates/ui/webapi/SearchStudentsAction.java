@@ -1,5 +1,7 @@
 package teammates.ui.webapi;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +31,7 @@ class SearchStudentsAction extends Action {
     }
 
     @Override
-    public JsonResult execute() {
+    public JsonResult execute() throws URISyntaxException, IOException, InterruptedException {
         String searchKey = getNonNullRequestParamValue(Const.ParamsNames.SEARCH_KEY);
         String entity = getNonNullRequestParamValue(Const.ParamsNames.ENTITY_TYPE);
         List<StudentAttributes> students;

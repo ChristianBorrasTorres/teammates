@@ -7,6 +7,21 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.eclipse.jetty.http.HttpParser.HttpHandler;
+import org.json.JSONObject;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse.BodyHandlers;
+
 import teammates.common.datatransfer.AttributesDeletionQuery;
 import teammates.common.datatransfer.InstructorPrivileges;
 import teammates.common.datatransfer.attributes.AccountAttributes;
@@ -17,8 +32,10 @@ import teammates.common.exception.EntityAlreadyExistsException;
 import teammates.common.exception.EntityDoesNotExistException;
 import teammates.common.exception.InvalidParametersException;
 import teammates.common.util.Const;
+import teammates.common.util.JsonUtils;
 import teammates.common.util.Logger;
 import teammates.storage.api.CoursesDb;
+import teammates.storage.entity.Course;
 
 /**
  * Handles operations related to courses.
@@ -72,8 +89,11 @@ public final class CoursesLogic {
 
     /**
      * Gets the institute associated with the course.
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      */
-    public String getCourseInstitute(String courseId) {
+    public String getCourseInstitute(String courseId) throws URISyntaxException, IOException, InterruptedException {
         CourseAttributes cd = getCourse(courseId);
         assert cd != null : "Trying to getCourseInstitute for inexistent course with id " + courseId;
         return cd.getInstitute();
@@ -85,10 +105,40 @@ public final class CoursesLogic {
      * @return the created course
      * @throws InvalidParametersException if the course is not valid
      * @throws EntityAlreadyExistsException if the course already exists in the database.
+     * @throws InterruptedException
+     * @throws IOException
      */
     CourseAttributes createCourse(CourseAttributes courseToCreate)
-            throws InvalidParametersException, EntityAlreadyExistsException {
-        return coursesDb.createEntity(courseToCreate);
+            throws InvalidParametersException, EntityAlreadyExistsException, URISyntaxException, IOException, InterruptedException {
+    //////////// Reemplazar este método por un http-request tipo post /////////////////////////
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule());
+    // Convertir courseToCreate a JSON
+    String requestBody = objectMapper.writeValueAsString(courseToCreate);
+    // Enviar la solicitud HTTP POST
+    HttpRequest postRequest = HttpRequest.newBuilder()
+            .uri(new URI("http://localhost:5000/Courses"))
+            .header("Content-Type", "application/json")
+            .POST(BodyPublishers.ofString(requestBody))
+            .build();
+    HttpClient httpClient = HttpClient.newHttpClient();
+    HttpResponse<String> response = httpClient.send(postRequest, BodyHandlers.ofString());
+    // Parsear la respuesta JSON y crear un nuevo objeto CourseAttributes
+    JSONObject newCourse = new JSONObject(response.body().toString());
+
+    String idCourse = newCourse.getString("id");
+    String nameCourse = newCourse.getString("name");
+    String timeZoneCourse = newCourse.getString("timeZone");
+    String instituteCourse = newCourse.getString("institute");
+
+    CourseAttributes courseAttributes = CourseAttributes.builder(idCourse)
+                        .withName(nameCourse)
+                        .withTimezone(timeZoneCourse)
+                        .withInstitute(instituteCourse)
+                        .build();
+    // Retornar el objeto CourseAttributes recién creado
+    return courseAttributes;
     }
 
     /**
@@ -98,7 +148,7 @@ public final class CoursesLogic {
      * * {@code instructorGoogleId} already has an account and instructor privileges.
      */
     public void createCourseAndInstructor(String instructorGoogleId, CourseAttributes courseToCreate)
-            throws InvalidParametersException, EntityAlreadyExistsException {
+            throws InvalidParametersException, EntityAlreadyExistsException, URISyntaxException, IOException, InterruptedException {
 
         AccountAttributes courseCreator = accountsLogic.getAccount(instructorGoogleId);
         assert courseCreator != null : "Trying to create a course for a non-existent instructor :" + instructorGoogleId;
@@ -119,7 +169,9 @@ public final class CoursesLogic {
             instructorsLogic.createInstructor(instructor);
         } catch (EntityAlreadyExistsException | InvalidParametersException e) {
             // roll back the transaction
+        ///////////////////Reemplazar este método por un http-request tipo delete /////////////
             coursesDb.deleteCourse(createdCourse.getId());
+        ///////////////////////////////////////////////////////////////////////////////////////
             String errorMessage = "Unexpected exception while trying to create instructor for a new course "
                                   + System.lineSeparator() + instructor.toString();
             assert false : errorMessage;
@@ -128,9 +180,48 @@ public final class CoursesLogic {
 
     /**
      * Gets the course with the specified ID.
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      */
-    public CourseAttributes getCourse(String courseId) {
-        return coursesDb.getCourse(courseId);
+    public CourseAttributes getCourse(String courseId) throws URISyntaxException, IOException, InterruptedException {
+
+    /////////////////Reemplazar esta linea con und http-Request tipo get  al microservicio///////////////////
+        HttpRequest get_request = HttpRequest.newBuilder()
+            .uri(new URI("http://localhost:5000/Course/"+courseId))
+            .build(); 
+
+        HttpClient httpClient = HttpClient.newHttpClient();
+        HttpResponse<String> response = httpClient.send(get_request, BodyHandlers.ofString());
+
+        JSONObject course = new JSONObject(response.body().toString());
+
+        String idCourse = course.getString("id");
+        String nameCourse = course.getString("name");
+        String timeZoneCourse = course.getString("timeZone");
+        String instituteCourse = course.getString("institute");
+        Instant createdAtCourse = Instant.parse(course.getString("createdAt"));
+        String deletedAt = course.getString("deletedAt");
+        
+        Instant deletedAtCourse;
+        if (deletedAt == null){
+            deletedAtCourse = null;
+        }
+        else {
+            deletedAtCourse = Instant.parse(course.getString("deletedAt"));
+        }
+
+        CourseAttributes courseAttributes = CourseAttributes.builder(idCourse)
+                        .withName(nameCourse)
+                        .withTimezone(timeZoneCourse)
+                        .withInstitute(instituteCourse)
+                        .build();
+        
+        courseAttributes.setDeletedAt(deletedAtCourse);
+        courseAttributes.setCreatedAt(createdAtCourse);
+        
+        return courseAttributes;
+    /////////////////El http-request debe retornar un objeto tipo CourseAttributes //////////////////////////
     }
 
     /**
@@ -177,8 +268,11 @@ public final class CoursesLogic {
      *
      * <p>Note: This method does not returns any Loner information presently.
      * Loner information must be returned as we decide to support loners in future.
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      */
-    public List<String> getTeamsForCourse(String courseId) throws EntityDoesNotExistException {
+    public List<String> getTeamsForCourse(String courseId) throws EntityDoesNotExistException, URISyntaxException, IOException, InterruptedException {
 
         if (getCourse(courseId) == null) {
             throw new EntityDoesNotExistException("The course " + courseId + " does not exist");
@@ -197,8 +291,11 @@ public final class CoursesLogic {
      *
      * <p>Note: This method does not returns any Loner information presently.
      * Loner information must be returned as we decide to support loners in future.
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      */
-    public List<String> getTeamsForSection(String sectionName, String courseId) throws EntityDoesNotExistException {
+    public List<String> getTeamsForSection(String sectionName, String courseId) throws EntityDoesNotExistException, URISyntaxException, IOException, InterruptedException {
 
         if (getCourse(courseId) == null) {
             throw new EntityDoesNotExistException("The course " + courseId + " does not exist");
@@ -222,11 +319,28 @@ public final class CoursesLogic {
         List<StudentAttributes> studentDataList = studentsLogic.getStudentsForGoogleId(googleId);
 
         List<String> courseIds = studentDataList.stream()
-                .filter(student -> !getCourse(student.getCourse()).isCourseDeleted())
+                .filter(student -> {
+                    try {
+                        try {
+                            return !getCourse(student.getCourse()).isCourseDeleted();
+                        } catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        } catch (InterruptedException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    } catch (URISyntaxException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    return false;
+                })
                 .map(StudentAttributes::getCourse)
                 .collect(Collectors.toList());
-
+    ////////////////// Reemplazar este método (coursesDb) por un http-request tipo get ///////////////////////////////
         return coursesDb.getCourses(courseIds);
+    ////////////////// El http-request debe traer un lista de objetos tipo CourseAttributes //////////////
     }
 
     /**
@@ -237,11 +351,15 @@ public final class CoursesLogic {
         assert instructorList != null;
 
         List<String> courseIdList = instructorList.stream()
+        /////////////////// Quitar coursesDb ///////////////////////////////////////////////////////////
                 .filter(instructor -> !coursesDb.getCourse(instructor.getCourseId()).isCourseDeleted())
+        ////////////////////////////////////////////////////////////////////////////////////////////////
                 .map(InstructorAttributes::getCourseId)
                 .collect(Collectors.toList());
 
+        /////////////////////// Reemplazar el método coursesDB por el mismo método que trae la list de cursos ///////
         List<CourseAttributes> courseList = coursesDb.getCourses(courseIdList);
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
         // Check that all courseIds queried returned a course.
         if (courseIdList.size() > courseList.size()) {
@@ -262,12 +380,15 @@ public final class CoursesLogic {
         assert instructorList != null;
 
         List<String> softDeletedCourseIdList = instructorList.stream()
+    //////////////////////////////// Quitar coursesDb /////////////////////////////////////////////////////
                 .filter(instructor -> coursesDb.getCourse(instructor.getCourseId()).isCourseDeleted())
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
                 .map(InstructorAttributes::getCourseId)
                 .collect(Collectors.toList());
 
+    //////////////////////////////// Reemplazar el método coursesDB por el mismo método que trae la list de cursos //////////////
         List<CourseAttributes> softDeletedCourseList = coursesDb.getCourses(softDeletedCourseIdList);
-
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if (softDeletedCourseIdList.size() > softDeletedCourseList.size()) {
             for (CourseAttributes ca : softDeletedCourseList) {
                 softDeletedCourseIdList.remove(ca.getId());
@@ -290,8 +411,13 @@ public final class CoursesLogic {
      */
     public CourseAttributes updateCourseCascade(CourseAttributes.UpdateOptions updateOptions)
             throws InvalidParametersException, EntityDoesNotExistException {
+    //////////////////////////////// Quitar coursesDb ////////////////////////////////////////////////////
         CourseAttributes oldCourse = coursesDb.getCourse(updateOptions.getCourseId());
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /////////////////////////////////// Reemplazar este método por un http-request tipo put //////////////
         CourseAttributes updatedCourse = coursesDb.updateCourse(updateOptions);
+    /////////////////////////////////// Debe retornar un objeto tipo CourseAttributes ////////////////////
 
         if (!updatedCourse.getTimeZone().equals(oldCourse.getTimeZone())) {
             feedbackSessionsLogic
@@ -305,8 +431,11 @@ public final class CoursesLogic {
      * Deletes a course cascade its students, instructors, sessions, responses, deadline extensions and comments.
      *
      * <p>Fails silently if no such course.
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      */
-    public void deleteCourseCascade(String courseId) {
+    public void deleteCourseCascade(String courseId) throws URISyntaxException, IOException, InterruptedException {
         if (getCourse(courseId) == null) {
             return;
         }
@@ -322,7 +451,9 @@ public final class CoursesLogic {
         instructorsLogic.deleteInstructors(query);
         deadlineExtensionsLogic.deleteDeadlineExtensions(query);
 
+        ////////////////////// Reemplazar este método por un http-request tipo delete /////////////////////
         coursesDb.deleteCourse(courseId);
+        ///////////////////////////////////////////////////////////////////////////////////////////////////
     }
 
     /**
@@ -330,22 +461,27 @@ public final class CoursesLogic {
      * @return the time when the course is moved to the recycle bin
      */
     public Instant moveCourseToRecycleBin(String courseId) throws EntityDoesNotExistException {
-
+    ////////////////// Reemplazar este método por un método put que cambio el atributo deletedAt ////
         return coursesDb.softDeleteCourse(courseId);
+    /////////////////////////////////////////////////////////////////////////////////////////////////
     }
 
     /**
      * Restores a course from Recycle Bin by its given corresponding ID.
      */
     public void restoreCourseFromRecycleBin(String courseId) throws EntityDoesNotExistException {
+    ////////////////// Reemplazar este método por un método put que cambio el atributo deletedAt ////
         coursesDb.restoreDeletedCourse(courseId);
+    /////////////////////////////////////////////////////////////////////////////////////////////////
     }
 
     /**
      * Gets the number of courses created within a specified time range.
      */
     int getNumCoursesByTimeRange(Instant startTime, Instant endTime) {
+    /////////////////////////// Reemplazar este método por un http-request tipo get /////////////////
         return coursesDb.getNumCoursesByTimeRange(startTime, endTime);
+    /////////////////////////// Debe retornar un int con el número de cursos creados dentro de startTime y endTime //////////
     }
 
 }

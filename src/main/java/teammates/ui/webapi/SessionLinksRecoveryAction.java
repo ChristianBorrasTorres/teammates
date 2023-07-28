@@ -2,6 +2,9 @@ package teammates.ui.webapi;
 
 import static teammates.common.util.FieldValidator.REGEX_EMAIL;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 import teammates.common.util.Const;
 import teammates.common.util.EmailSendingStatus;
 import teammates.common.util.EmailWrapper;
@@ -24,7 +27,7 @@ class SessionLinksRecoveryAction extends Action {
     }
 
     @Override
-    public JsonResult execute() {
+    public JsonResult execute() throws URISyntaxException, IOException, InterruptedException {
         String recoveryEmailAddress = getNonNullRequestParamValue(Const.ParamsNames.STUDENT_EMAIL);
 
         if (!StringHelper.isMatching(recoveryEmailAddress, REGEX_EMAIL)) {

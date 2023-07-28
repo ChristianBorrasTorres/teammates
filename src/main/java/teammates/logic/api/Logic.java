@@ -1,5 +1,7 @@
 package teammates.logic.api;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
@@ -114,7 +116,7 @@ public class Logic {
         return accountsLogic.updateReadNotifications(googleId, notificationId, endTime);
     }
 
-    public String getCourseInstitute(String courseId) {
+    public String getCourseInstitute(String courseId) throws URISyntaxException, IOException, InterruptedException {
         return coursesLogic.getCourseInstitute(courseId);
     }
 
@@ -195,8 +197,11 @@ public class Logic {
      *
      * <p>Preconditions:</p>
      * * All parameters are non-null.
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      */
-    public void deleteAccountCascade(String googleId) {
+    public void deleteAccountCascade(String googleId) throws URISyntaxException, IOException, InterruptedException {
 
         assert googleId != null;
 
@@ -399,9 +404,12 @@ public class Logic {
      * Creates an account for the instructor if no existing account is found.
      * Preconditions: <br>
      * * Parameters regkey and googleId are non-null.
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      */
     public InstructorAttributes joinCourseForInstructor(String regkey, String googleId)
-            throws InvalidParametersException, EntityDoesNotExistException, EntityAlreadyExistsException {
+            throws InvalidParametersException, EntityDoesNotExistException, EntityAlreadyExistsException, URISyntaxException, IOException, InterruptedException {
 
         assert googleId != null;
         assert regkey != null;
@@ -433,7 +441,7 @@ public class Logic {
      * * {@code instructorGoogleId} already has an account and instructor privileges.
      */
     public void createCourseAndInstructor(String instructorGoogleId, CourseAttributes courseAttributes)
-            throws EntityAlreadyExistsException, InvalidParametersException {
+            throws EntityAlreadyExistsException, InvalidParametersException, URISyntaxException, IOException, InterruptedException {
         assert instructorGoogleId != null;
         assert courseAttributes != null;
 
@@ -444,8 +452,11 @@ public class Logic {
      * Preconditions: <br>
      * * All parameters are non-null.
      * @return null if not found.
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      */
-    public CourseAttributes getCourse(String courseId) {
+    public CourseAttributes getCourse(String courseId) throws URISyntaxException, IOException, InterruptedException {
 
         assert courseId != null;
 
@@ -529,8 +540,11 @@ public class Logic {
      *
      * <br/>Preconditions: <br/>
      * * All parameters are non-null.
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      */
-    public void deleteCourseCascade(String courseId) {
+    public void deleteCourseCascade(String courseId) throws URISyntaxException, IOException, InterruptedException {
         assert courseId != null;
         coursesLogic.deleteCourseCascade(courseId);
     }
@@ -671,9 +685,12 @@ public class Logic {
      * @param emailOfEntityDoingQuestion the email of the entity doing the question
      * @param teamOfEntityDoingQuestion the team of the entity doing the question. If the entity is an instructor,
      *                                  it can be {@code null}.
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      */
     public void populateFieldsToGenerateInQuestion(FeedbackQuestionAttributes feedbackQuestionAttributes,
-            String emailOfEntityDoingQuestion, String teamOfEntityDoingQuestion) {
+            String emailOfEntityDoingQuestion, String teamOfEntityDoingQuestion) throws URISyntaxException, IOException, InterruptedException {
         assert feedbackQuestionAttributes != null;
         assert emailOfEntityDoingQuestion != null;
 
@@ -786,9 +803,12 @@ public class Logic {
      * Preconditions: <br>
      * * All parameters are non-null.
      * @param key the registration key
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      */
     public StudentAttributes joinCourseForStudent(String key, String googleId)
-            throws InvalidParametersException, EntityDoesNotExistException, EntityAlreadyExistsException {
+            throws InvalidParametersException, EntityDoesNotExistException, EntityAlreadyExistsException, URISyntaxException, IOException, InterruptedException {
 
         assert googleId != null;
         assert key != null;
@@ -1337,10 +1357,13 @@ public class Logic {
      *
      * <br/>Preconditions: <br/>
      * * All parameters are non-null.
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      */
     public FeedbackResponseCommentAttributes createFeedbackResponseComment(
             FeedbackResponseCommentAttributes feedbackResponseComment)
-            throws InvalidParametersException, EntityDoesNotExistException, EntityAlreadyExistsException {
+            throws InvalidParametersException, EntityDoesNotExistException, EntityAlreadyExistsException, URISyntaxException, IOException, InterruptedException {
         assert feedbackResponseComment != null;
 
         return feedbackResponseCommentsLogic.createFeedbackResponseComment(feedbackResponseComment);
@@ -1392,31 +1415,37 @@ public class Logic {
 
     /**
      * Returns returns a list of sessions that were closed within past hour.
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      *
      * @see FeedbackSessionsLogic#getFeedbackSessionsClosedWithinThePastHour()
      */
-    public List<FeedbackSessionAttributes> getFeedbackSessionsClosedWithinThePastHour() {
+    public List<FeedbackSessionAttributes> getFeedbackSessionsClosedWithinThePastHour() throws URISyntaxException, IOException, InterruptedException {
         return feedbackSessionsLogic.getFeedbackSessionsClosedWithinThePastHour();
     }
 
-    public List<FeedbackSessionAttributes> getFeedbackSessionsClosingWithinTimeLimit() {
+    public List<FeedbackSessionAttributes> getFeedbackSessionsClosingWithinTimeLimit() throws URISyntaxException, IOException, InterruptedException {
         return feedbackSessionsLogic.getFeedbackSessionsClosingWithinTimeLimit();
     }
 
-    public List<FeedbackSessionAttributes> getFeedbackSessionsOpeningWithinTimeLimit() {
+    public List<FeedbackSessionAttributes> getFeedbackSessionsOpeningWithinTimeLimit() throws URISyntaxException, IOException, InterruptedException {
         return feedbackSessionsLogic.getFeedbackSessionsOpeningWithinTimeLimit();
     }
 
     /**
      * Returns a list of sessions that require automated emails to be sent as they are published.
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      *
      * @see FeedbackSessionsLogic#getFeedbackSessionsWhichNeedAutomatedPublishedEmailsToBeSent()
      */
-    public List<FeedbackSessionAttributes> getFeedbackSessionsWhichNeedAutomatedPublishedEmailsToBeSent() {
+    public List<FeedbackSessionAttributes> getFeedbackSessionsWhichNeedAutomatedPublishedEmailsToBeSent() throws URISyntaxException, IOException, InterruptedException {
         return feedbackSessionsLogic.getFeedbackSessionsWhichNeedAutomatedPublishedEmailsToBeSent();
     }
 
-    public List<FeedbackSessionAttributes> getFeedbackSessionsWhichNeedOpenEmailsToBeSent() {
+    public List<FeedbackSessionAttributes> getFeedbackSessionsWhichNeedOpenEmailsToBeSent() throws URISyntaxException, IOException, InterruptedException {
         return feedbackSessionsLogic.getFeedbackSessionsWhichNeedOpenEmailsToBeSent();
     }
 

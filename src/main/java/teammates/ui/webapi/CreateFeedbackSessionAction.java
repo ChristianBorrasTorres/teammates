@@ -1,5 +1,7 @@
 package teammates.ui.webapi;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.Instant;
 
 import teammates.common.datatransfer.InstructorPermissionSet;
@@ -31,7 +33,7 @@ class CreateFeedbackSessionAction extends Action {
     }
 
     @Override
-    void checkSpecificAccessControl() throws UnauthorizedAccessException {
+    void checkSpecificAccessControl() throws UnauthorizedAccessException, URISyntaxException, IOException, InterruptedException {
         String courseId = getNonNullRequestParamValue(Const.ParamsNames.COURSE_ID);
 
         InstructorAttributes instructor = logic.getInstructorForGoogleId(courseId, userInfo.getId());
@@ -41,7 +43,7 @@ class CreateFeedbackSessionAction extends Action {
     }
 
     @Override
-    public JsonResult execute() throws InvalidHttpRequestBodyException, InvalidOperationException {
+    public JsonResult execute() throws InvalidHttpRequestBodyException, InvalidOperationException, URISyntaxException, IOException, InterruptedException {
         String courseId = getNonNullRequestParamValue(Const.ParamsNames.COURSE_ID);
         CourseAttributes course = logic.getCourse(courseId);
         FeedbackSessionCreateRequest createRequest =

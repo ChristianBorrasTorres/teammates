@@ -1,5 +1,7 @@
 package teammates.logic.core;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -565,9 +567,12 @@ public final class FeedbackQuestionsLogic {
      * @param emailOfEntityDoingQuestion the email of the entity doing the question
      * @param teamOfEntityDoingQuestion the team of the entity doing the question. If the entity is an instructor,
      *                                  it can be {@code null}.
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      */
     public void populateFieldsToGenerateInQuestion(FeedbackQuestionAttributes feedbackQuestionAttributes,
-            String emailOfEntityDoingQuestion, String teamOfEntityDoingQuestion) {
+            String emailOfEntityDoingQuestion, String teamOfEntityDoingQuestion) throws URISyntaxException, IOException, InterruptedException {
         List<String> optionList;
 
         FeedbackParticipantType generateOptionsFor;

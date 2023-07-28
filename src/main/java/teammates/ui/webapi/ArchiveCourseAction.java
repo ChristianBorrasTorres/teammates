@@ -1,5 +1,8 @@
 package teammates.ui.webapi;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 import org.apache.http.HttpStatus;
 
 import teammates.common.exception.EntityDoesNotExistException;
@@ -23,7 +26,7 @@ class ArchiveCourseAction extends Action {
     }
 
     @Override
-    void checkSpecificAccessControl() throws UnauthorizedAccessException {
+    void checkSpecificAccessControl() throws UnauthorizedAccessException, URISyntaxException, IOException, InterruptedException {
         String idOfCourseToArchive = getNonNullRequestParamValue(Const.ParamsNames.COURSE_ID);
         gateKeeper.verifyAccessible(logic.getInstructorForGoogleId(idOfCourseToArchive, userInfo.id),
                 logic.getCourse(idOfCourseToArchive));
