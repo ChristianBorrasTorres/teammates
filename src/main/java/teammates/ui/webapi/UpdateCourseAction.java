@@ -36,7 +36,7 @@ class UpdateCourseAction extends Action {
     }
 
     @Override
-    public JsonResult execute() throws InvalidHttpRequestBodyException {
+    public JsonResult execute() throws InvalidHttpRequestBodyException, URISyntaxException, IOException, InterruptedException {
         CourseUpdateRequest courseUpdateRequest = getAndValidateRequestBody(CourseUpdateRequest.class);
         String courseTimeZone = courseUpdateRequest.getTimeZone();
 

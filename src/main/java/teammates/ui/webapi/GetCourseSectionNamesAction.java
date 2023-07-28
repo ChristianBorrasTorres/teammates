@@ -29,7 +29,7 @@ class GetCourseSectionNamesAction extends Action {
     }
 
     @Override
-    public JsonResult execute() {
+    public JsonResult execute() throws URISyntaxException, IOException, InterruptedException {
         String courseId = getNonNullRequestParamValue(Const.ParamsNames.COURSE_ID);
         try {
             List<String> sectionNames = logic.getSectionNamesForCourse(courseId);

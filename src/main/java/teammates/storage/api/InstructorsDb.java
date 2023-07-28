@@ -348,7 +348,7 @@ public final class InstructorsDb extends EntitiesDb<Instructor, InstructorAttrib
 
     private Instructor getInstructorEntityForGoogleId(String courseId, String googleId) {
         return getInstructorsForGoogleIdQuery(googleId)
-                .filter("courseId =", courseId)
+                //.filter("courseId =", courseId)
                 .first().now();
     }
 

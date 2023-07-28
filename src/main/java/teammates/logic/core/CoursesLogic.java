@@ -200,15 +200,17 @@ public final class CoursesLogic {
         String nameCourse = course.getString("name");
         String timeZoneCourse = course.getString("timeZone");
         String instituteCourse = course.getString("institute");
-        Instant createdAtCourse = Instant.parse(course.getString("createdAt"));
-        String deletedAt = course.getString("deletedAt");
+        String createdAt = course.getString("createdAt");
+
+        Instant createdAtCourse = Instant.parse(createdAt.substring(0,22) + "Z");
         
         Instant deletedAtCourse;
-        if (deletedAt == null){
+        if (course.isNull("deletedAt")){
             deletedAtCourse = null;
         }
         else {
-            deletedAtCourse = Instant.parse(course.getString("deletedAt"));
+            String deletedAt = course.getString("deletedAt");
+            deletedAtCourse = Instant.parse(deletedAt.substring(0,22) + "Z");
         }
 
         CourseAttributes courseAttributes = CourseAttributes.builder(idCourse)
@@ -226,15 +228,21 @@ public final class CoursesLogic {
 
     /**
      * Returns true if the course with ID courseId is present.
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws URISyntaxException
      */
-    public boolean isCoursePresent(String courseId) {
-        return coursesDb.getCourse(courseId) != null;
+    public boolean isCoursePresent(String courseId) throws URISyntaxException, IOException, InterruptedException {
+        return getCourse(courseId) != null;
     }
 
     /**
      * Used to trigger an {@link EntityDoesNotExistException} if the course is not present.
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws URISyntaxException
      */
-    void verifyCourseIsPresent(String courseId) throws EntityDoesNotExistException {
+    void verifyCourseIsPresent(String courseId) throws EntityDoesNotExistException, URISyntaxException, IOException, InterruptedException {
         if (!isCoursePresent(courseId)) {
             throw new EntityDoesNotExistException("Course does not exist: " + courseId);
         }
@@ -244,8 +252,11 @@ public final class CoursesLogic {
      * Returns a list of section names for the course with valid ID courseId.
      *
      * @param courseId Course ID of the course
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws URISyntaxException
      */
-    public List<String> getSectionsNameForCourse(String courseId) throws EntityDoesNotExistException {
+    public List<String> getSectionsNameForCourse(String courseId) throws EntityDoesNotExistException, URISyntaxException, IOException, InterruptedException {
         verifyCourseIsPresent(courseId);
 
         List<StudentAttributes> studentDataList = studentsLogic.getStudentsForCourse(courseId);
@@ -352,7 +363,21 @@ public final class CoursesLogic {
 
         List<String> courseIdList = instructorList.stream()
         /////////////////// Quitar coursesDb ///////////////////////////////////////////////////////////
-                .filter(instructor -> !coursesDb.getCourse(instructor.getCourseId()).isCourseDeleted())
+                .filter(instructor -> {
+                    try {
+                        return !getCourse(instructor.getCourseId()).isCourseDeleted();
+                    } catch (URISyntaxException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    return false;
+                })
         ////////////////////////////////////////////////////////////////////////////////////////////////
                 .map(InstructorAttributes::getCourseId)
                 .collect(Collectors.toList());
@@ -381,7 +406,21 @@ public final class CoursesLogic {
 
         List<String> softDeletedCourseIdList = instructorList.stream()
     //////////////////////////////// Quitar coursesDb /////////////////////////////////////////////////////
-                .filter(instructor -> coursesDb.getCourse(instructor.getCourseId()).isCourseDeleted())
+                .filter(instructor -> {
+                    try {
+                        return getCourse(instructor.getCourseId()).isCourseDeleted();
+                    } catch (URISyntaxException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    return false;
+                })
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
                 .map(InstructorAttributes::getCourseId)
                 .collect(Collectors.toList());
@@ -408,11 +447,14 @@ public final class CoursesLogic {
      * @return updated course
      * @throws InvalidParametersException if attributes to update are not valid
      * @throws EntityDoesNotExistException if the course cannot be found
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws URISyntaxException
      */
     public CourseAttributes updateCourseCascade(CourseAttributes.UpdateOptions updateOptions)
-            throws InvalidParametersException, EntityDoesNotExistException {
+            throws InvalidParametersException, EntityDoesNotExistException, URISyntaxException, IOException, InterruptedException {
     //////////////////////////////// Quitar coursesDb ////////////////////////////////////////////////////
-        CourseAttributes oldCourse = coursesDb.getCourse(updateOptions.getCourseId());
+        CourseAttributes oldCourse = getCourse(updateOptions.getCourseId());
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /////////////////////////////////// Reemplazar este método por un http-request tipo put //////////////

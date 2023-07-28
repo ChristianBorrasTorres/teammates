@@ -367,7 +367,7 @@ public final class FeedbackResponseCommentsLogic {
                 : relatedComment.isVisibleTo(viewerType);
     }
 
-    private void verifyIsCoursePresent(String courseId) throws EntityDoesNotExistException {
+    private void verifyIsCoursePresent(String courseId) throws EntityDoesNotExistException, URISyntaxException, IOException, InterruptedException {
         if (!coursesLogic.isCoursePresent(courseId)) {
             throw new EntityDoesNotExistException(
                     "Trying to create feedback response comments for a course that does not exist.");

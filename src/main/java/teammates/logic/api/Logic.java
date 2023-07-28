@@ -507,9 +507,12 @@ public class Logic {
      * @return updated course
      * @throws InvalidParametersException if attributes to update are not valid
      * @throws EntityDoesNotExistException if the course cannot be found
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws URISyntaxException
      */
     public CourseAttributes updateCourseCascade(CourseAttributes.UpdateOptions updateOptions)
-            throws InvalidParametersException, EntityDoesNotExistException {
+            throws InvalidParametersException, EntityDoesNotExistException, URISyntaxException, IOException, InterruptedException {
         assert updateOptions != null;
 
         return coursesLogic.updateCourseCascade(updateOptions);
@@ -665,10 +668,13 @@ public class Logic {
      *
      * <p>Preconditions: <br>
      * * All parameters are non-null.
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws URISyntaxException
      *
      * @see CoursesLogic#getSectionsNameForCourse(String)
      */
-    public List<String> getSectionNamesForCourse(String courseId) throws EntityDoesNotExistException {
+    public List<String> getSectionNamesForCourse(String courseId) throws EntityDoesNotExistException, URISyntaxException, IOException, InterruptedException {
         assert courseId != null;
         return coursesLogic.getSectionsNameForCourse(courseId);
     }
