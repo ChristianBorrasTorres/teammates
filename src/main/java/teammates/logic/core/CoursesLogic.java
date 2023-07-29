@@ -98,7 +98,9 @@ public final class CoursesLogic {
         assert cd != null : "Trying to getCourseInstitute for inexistent course with id " + courseId;
         return cd.getInstitute();
     }
-
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////// Nuevo método CreateCourse ///////////////////////////////
     /**
      * Creates a course.
      *
@@ -110,7 +112,6 @@ public final class CoursesLogic {
      */
     CourseAttributes createCourse(CourseAttributes courseToCreate)
             throws InvalidParametersException, EntityAlreadyExistsException, URISyntaxException, IOException, InterruptedException {
-    //////////// Reemplazar este método por un http-request tipo post /////////////////////////
 
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.registerModule(new JavaTimeModule());
@@ -140,6 +141,9 @@ public final class CoursesLogic {
     // Retornar el objeto CourseAttributes recién creado
     return courseAttributes;
     }
+    ///////////////////////////////// Nuevo método CreateCourse ///////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Creates a course and an associated instructor for the course.
@@ -169,15 +173,16 @@ public final class CoursesLogic {
             instructorsLogic.createInstructor(instructor);
         } catch (EntityAlreadyExistsException | InvalidParametersException e) {
             // roll back the transaction
-        ///////////////////Reemplazar este método por un http-request tipo delete /////////////
             deleteCourse(createdCourse.getId());
-        ///////////////////////////////////////////////////////////////////////////////////////
             String errorMessage = "Unexpected exception while trying to create instructor for a new course "
                                   + System.lineSeparator() + instructor.toString();
             assert false : errorMessage;
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////// Nuevo método GetCourse //////////////////////////////////
     /**
      * Gets the course with the specified ID.
      * @throws URISyntaxException
@@ -186,7 +191,6 @@ public final class CoursesLogic {
      */
     public CourseAttributes getCourse(String courseId) throws URISyntaxException, IOException, InterruptedException {
 
-    /////////////////Reemplazar esta linea con und http-Request tipo get  al microservicio///////////////////
         HttpRequest get_request = HttpRequest.newBuilder()
             .uri(new URI("http://localhost:5000/Course/"+courseId))
             .build(); 
@@ -223,8 +227,10 @@ public final class CoursesLogic {
         courseAttributes.setCreatedAt(createdAtCourse);
         
         return courseAttributes;
-    /////////////////El http-request debe retornar un objeto tipo CourseAttributes //////////////////////////
     }
+    ///////////////////////////////// Nuevo método GetCourse //////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Returns true if the course with ID courseId is present.
@@ -352,9 +358,7 @@ public final class CoursesLogic {
                 })
                 .map(StudentAttributes::getCourse)
                 .collect(Collectors.toList());
-    ////////////////// Reemplazar este método (coursesDb) por un http-request tipo get ///////////////////////////////
         return getCourses(courseIds);
-    ////////////////// El http-request debe traer un lista de objetos tipo CourseAttributes //////////////
     }
 
     /**
@@ -368,7 +372,6 @@ public final class CoursesLogic {
         assert instructorList != null;
 
         List<String> courseIdList = instructorList.stream()
-        /////////////////// Quitar coursesDb ///////////////////////////////////////////////////////////
                 .filter(instructor -> {
                     try {
                         return !getCourse(instructor.getCourseId()).isCourseDeleted();
@@ -384,13 +387,10 @@ public final class CoursesLogic {
                     }
                     return false;
                 })
-        ////////////////////////////////////////////////////////////////////////////////////////////////
                 .map(InstructorAttributes::getCourseId)
                 .collect(Collectors.toList());
 
-        /////////////////////// Reemplazar el método coursesDB por el mismo método que trae la list de cursos ///////
         List<CourseAttributes> courseList = getCourses(courseIdList);
-        ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
         // Check that all courseIds queried returned a course.
         if (courseIdList.size() > courseList.size()) {
@@ -414,7 +414,7 @@ public final class CoursesLogic {
         assert instructorList != null;
 
         List<String> softDeletedCourseIdList = instructorList.stream()
-    //////////////////////////////// Quitar coursesDb /////////////////////////////////////////////////////
+
                 .filter(instructor -> {
                     try {
                         return getCourse(instructor.getCourseId()).isCourseDeleted();
@@ -430,13 +430,11 @@ public final class CoursesLogic {
                     }
                     return false;
                 })
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////
                 .map(InstructorAttributes::getCourseId)
                 .collect(Collectors.toList());
 
-    //////////////////////////////// Reemplazar el método coursesDB por el mismo método que trae la list de cursos //////////////
         List<CourseAttributes> softDeletedCourseList = getCourses(softDeletedCourseIdList);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
         if (softDeletedCourseIdList.size() > softDeletedCourseList.size()) {
             for (CourseAttributes ca : softDeletedCourseList) {
                 softDeletedCourseIdList.remove(ca.getId());
@@ -448,6 +446,9 @@ public final class CoursesLogic {
         return softDeletedCourseList;
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////// Nuevo método UpdateCourse ///////////////////////////////
     /**
      * Updates a course by {@link CourseAttributes.UpdateOptions}.
      *
@@ -462,21 +463,56 @@ public final class CoursesLogic {
      */
     public CourseAttributes updateCourseCascade(CourseAttributes.UpdateOptions updateOptions)
             throws InvalidParametersException, EntityDoesNotExistException, URISyntaxException, IOException, InterruptedException {
-    //////////////////////////////// Quitar coursesDb ////////////////////////////////////////////////////
-        CourseAttributes oldCourse = getCourse(updateOptions.getCourseId());
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /////////////////////////////////// Reemplazar este método por un http-request tipo put //////////////
-        CourseAttributes updatedCourse = coursesDb.updateCourse(updateOptions);
-    /////////////////////////////////// Debe retornar un objeto tipo CourseAttributes ////////////////////
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
 
-        if (!updatedCourse.getTimeZone().equals(oldCourse.getTimeZone())) {
-            feedbackSessionsLogic
-                    .updateFeedbackSessionsTimeZoneForCourse(updatedCourse.getId(), updatedCourse.getTimeZone());
+        CourseAttributes courseToUpdate = getCourse(updateOptions.getCourseId());
+        courseToUpdate.update(updateOptions);
+        // Convertir courseToCreate a JSON
+        String requestBody = objectMapper.writeValueAsString(courseToUpdate);
+        // Enviar la solicitud HTTP PUT
+        HttpRequest putRequest = HttpRequest.newBuilder()
+            .uri(new URI("http://localhost:5000/Course/"+updateOptions.getCourseId()))
+            .header("Content-Type", "application/json")
+            .PUT(BodyPublishers.ofString(requestBody))
+            .build();
+        HttpClient httpClient = HttpClient.newHttpClient();
+        HttpResponse<String> response = httpClient.send(putRequest, BodyHandlers.ofString());
+        // Parsear la respuesta JSON y crear un nuevo objeto CourseAttributes
+        JSONObject updatedCourse = new JSONObject(response.body().toString());
+
+        String idCourse = updatedCourse.getString("id");
+        String nameCourse = updatedCourse.getString("name");
+        String timeZoneCourse = updatedCourse.getString("timeZone");
+        String instituteCourse = updatedCourse.getString("institute");
+        String createdAt = updatedCourse.getString("createdAt");
+
+        Instant createdAtCourse = Instant.parse(createdAt.substring(0,22) + "Z");
+        
+        Instant deletedAtCourse;
+        if (updatedCourse.isNull("deletedAt")){
+            deletedAtCourse = null;
+        }
+        else {
+            String deletedAt = updatedCourse.getString("deletedAt");
+            deletedAtCourse = Instant.parse(deletedAt.substring(0,22) + "Z");
         }
 
-        return updatedCourse;
+        CourseAttributes courseAttributes = CourseAttributes.builder(idCourse)
+                        .withName(nameCourse)
+                        .withTimezone(timeZoneCourse)
+                        .withInstitute(instituteCourse)
+                        .build();
+        
+        courseAttributes.setDeletedAt(deletedAtCourse);
+        courseAttributes.setCreatedAt(createdAtCourse);
+
+        return courseAttributes;
     }
+    ///////////////////////////////// Nuevo método UpdateCourse ///////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Deletes a course cascade its students, instructors, sessions, responses, deadline extensions and comments.
@@ -502,11 +538,12 @@ public final class CoursesLogic {
         instructorsLogic.deleteInstructors(query);
         deadlineExtensionsLogic.deleteDeadlineExtensions(query);
 
-        ////////////////////// Reemplazar este método por un http-request tipo delete /////////////////////
         deleteCourse(courseId);
-        ///////////////////////////////////////////////////////////////////////////////////////////////////
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////// Nuevo método SoftDeleteCourse ///////////////////////////
     /**
      * Moves a course to Recycle Bin by its given corresponding ID.
      * @return the time when the course is moved to the recycle bin
@@ -531,9 +568,14 @@ public final class CoursesLogic {
         System.out.println(deletedAt);
         Instant deletedAtCourse = Instant.parse(deletedAtInstant);
         return deletedAtCourse;
-    /////////////////////////////////////////////////////////////////////////////////////////////////
     }
+    ///////////////////////////////// Nuevo método SoftDeleteCourse ///////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////// Nuevo método RestoreCourse //////////////////////////////
     /**
      * Restores a course from Recycle Bin by its given corresponding ID.
      * @throws URISyntaxException
@@ -553,8 +595,11 @@ public final class CoursesLogic {
         HttpResponse<String> response = httpClient.send(putRequest, BodyHandlers.ofString());
 
         System.out.println(response);
-    /////////////////////////////////////////////////////////////////////////////////////////////////
     }
+    ///////////////////////////////// Nuevo método RestoreCourse //////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
 
     /**
      * Gets the number of courses created within a specified time range.
@@ -564,6 +609,10 @@ public final class CoursesLogic {
         return coursesDb.getNumCoursesByTimeRange(startTime, endTime);
     /////////////////////////// Debe retornar un int con el número de cursos creados dentro de startTime y endTime //////////
     }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////// Nuevo método getCourses /////////////////////////////////
 
     public List<CourseAttributes> getCourses(List<String> courseIds) throws URISyntaxException, IOException, InterruptedException {
 
@@ -587,7 +636,9 @@ public final class CoursesLogic {
         HttpResponse<String> response = httpClient.send(delete_request, BodyHandlers.ofString());
 
         System.out.print(response);
- 
     }
+    ///////////////////////////////// Nuevo método getCourses /////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
 
 }
