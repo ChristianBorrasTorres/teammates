@@ -170,7 +170,7 @@ public final class CoursesLogic {
         } catch (EntityAlreadyExistsException | InvalidParametersException e) {
             // roll back the transaction
         ///////////////////Reemplazar este método por un http-request tipo delete /////////////
-            coursesDb.deleteCourse(createdCourse.getId());
+            deleteCourse(createdCourse.getId());
         ///////////////////////////////////////////////////////////////////////////////////////
             String errorMessage = "Unexpected exception while trying to create instructor for a new course "
                                   + System.lineSeparator() + instructor.toString();
@@ -503,26 +503,56 @@ public final class CoursesLogic {
         deadlineExtensionsLogic.deleteDeadlineExtensions(query);
 
         ////////////////////// Reemplazar este método por un http-request tipo delete /////////////////////
-        coursesDb.deleteCourse(courseId);
+        deleteCourse(courseId);
         ///////////////////////////////////////////////////////////////////////////////////////////////////
     }
 
     /**
      * Moves a course to Recycle Bin by its given corresponding ID.
      * @return the time when the course is moved to the recycle bin
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws URISyntaxException
      */
-    public Instant moveCourseToRecycleBin(String courseId) throws EntityDoesNotExistException {
+    public Instant moveCourseToRecycleBin(String courseId) throws EntityDoesNotExistException, IOException, InterruptedException, URISyntaxException {
     ////////////////// Reemplazar este método por un método put que cambio el atributo deletedAt ////
-        return coursesDb.softDeleteCourse(courseId);
+        String softDelete = "Softdelete";
+    
+        HttpRequest putRequest = HttpRequest.newBuilder()
+            .uri(new URI("http://localhost:5000/Softdelete/"+courseId))
+            .header("Content-Type", "application/json")
+            .PUT(BodyPublishers.ofString(softDelete))
+            .build();
+        HttpClient httpClient = HttpClient.newHttpClient();
+        HttpResponse<String> response = httpClient.send(putRequest, BodyHandlers.ofString());
+
+        String deletedAt = response.body().toString();
+        String deletedAtInstant = deletedAt.substring(1, 11) + "T" + deletedAt.substring(12, 23) + "Z";
+        System.out.println(deletedAt);
+        Instant deletedAtCourse = Instant.parse(deletedAtInstant);
+        return deletedAtCourse;
     /////////////////////////////////////////////////////////////////////////////////////////////////
     }
 
     /**
      * Restores a course from Recycle Bin by its given corresponding ID.
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      */
-    public void restoreCourseFromRecycleBin(String courseId) throws EntityDoesNotExistException {
+    public void restoreCourseFromRecycleBin(String courseId) throws EntityDoesNotExistException, URISyntaxException, IOException, InterruptedException {
     ////////////////// Reemplazar este método por un método put que cambio el atributo deletedAt ////
-        coursesDb.restoreDeletedCourse(courseId);
+        String restore = "Restore";
+    
+        HttpRequest putRequest = HttpRequest.newBuilder()
+            .uri(new URI("http://localhost:5000/Restore/"+courseId))
+            .header("Content-Type", "application/json")
+            .PUT(BodyPublishers.ofString(restore))
+            .build();
+        HttpClient httpClient = HttpClient.newHttpClient();
+        HttpResponse<String> response = httpClient.send(putRequest, BodyHandlers.ofString());
+
+        System.out.println(response);
     /////////////////////////////////////////////////////////////////////////////////////////////////
     }
 
@@ -544,6 +574,20 @@ public final class CoursesLogic {
             coursesList.add(course);
         }    
         return coursesList;
+    }
+
+    public void deleteCourse(String courseId) throws URISyntaxException, IOException, InterruptedException {
+        
+        HttpRequest delete_request = HttpRequest.newBuilder()
+            .uri(new URI("http://localhost:5000/Course/"+courseId))
+            .DELETE()
+            .build(); 
+
+        HttpClient httpClient = HttpClient.newHttpClient();
+        HttpResponse<String> response = httpClient.send(delete_request, BodyHandlers.ofString());
+
+        System.out.print(response);
+ 
     }
 
 }

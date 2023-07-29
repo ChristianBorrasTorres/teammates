@@ -28,7 +28,7 @@ class RestoreCourseAction extends Action {
     }
 
     @Override
-    public JsonResult execute() {
+    public JsonResult execute() throws URISyntaxException, IOException, InterruptedException {
 
         String idOfCourseToRestore = getNonNullRequestParamValue(Const.ParamsNames.COURSE_ID);
         String statusMessage;

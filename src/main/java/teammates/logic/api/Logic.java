@@ -571,8 +571,11 @@ public class Logic {
      * * All parameters are non-null.
      *
      * @return the deletion timestamp assigned to the course.
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     * @throws IOException
      */
-    public Instant moveCourseToRecycleBin(String courseId) throws EntityDoesNotExistException {
+    public Instant moveCourseToRecycleBin(String courseId) throws EntityDoesNotExistException, IOException, InterruptedException, URISyntaxException {
         assert courseId != null;
         return coursesLogic.moveCourseToRecycleBin(courseId);
     }
@@ -583,9 +586,12 @@ public class Logic {
      *
      * <br/>Preconditions: <br/>
      * * All parameters are non-null.
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws URISyntaxException
      */
     public void restoreCourseFromRecycleBin(String courseId)
-            throws EntityDoesNotExistException {
+            throws EntityDoesNotExistException, URISyntaxException, IOException, InterruptedException {
         assert courseId != null;
 
         coursesLogic.restoreCourseFromRecycleBin(courseId);
