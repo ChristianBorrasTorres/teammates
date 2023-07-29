@@ -1,5 +1,7 @@
 package teammates.ui.webapi;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +36,7 @@ class GetCoursesAction extends Action {
     }
 
     @Override
-    public JsonResult execute() {
+    public JsonResult execute() throws URISyntaxException, IOException, InterruptedException {
         String entityType = getNonNullRequestParamValue(Const.ParamsNames.ENTITY_TYPE);
         switch (entityType) {
         case Const.EntityType.STUDENT:
@@ -46,14 +48,14 @@ class GetCoursesAction extends Action {
         }
     }
 
-    private JsonResult getStudentCourses() {
+    private JsonResult getStudentCourses() throws URISyntaxException, IOException, InterruptedException {
         List<CourseAttributes> courses = logic.getCoursesForStudentAccount(userInfo.id);
         CoursesData coursesData = new CoursesData(courses);
         coursesData.getCourses().forEach(CourseData::hideInformationForStudent);
         return new JsonResult(coursesData);
     }
 
-    private JsonResult getInstructorCourses() {
+    private JsonResult getInstructorCourses() throws URISyntaxException, IOException, InterruptedException {
         String courseStatus = getNonNullRequestParamValue(Const.ParamsNames.COURSE_STATUS);
         List<CourseAttributes> courses;
         List<InstructorAttributes> instructors;
@@ -93,11 +95,11 @@ class GetCoursesAction extends Action {
         return new JsonResult(coursesData);
     }
 
-    private List<CourseAttributes> getCourse(List<InstructorAttributes> instructors) {
+    private List<CourseAttributes> getCourse(List<InstructorAttributes> instructors) throws URISyntaxException, IOException, InterruptedException {
         return logic.getCoursesForInstructor(instructors);
     }
 
-    private List<CourseAttributes> getSoftDeletedCourse(List<InstructorAttributes> instructors) {
+    private List<CourseAttributes> getSoftDeletedCourse(List<InstructorAttributes> instructors) throws URISyntaxException, IOException, InterruptedException {
         return logic.getSoftDeletedCoursesForInstructors(instructors);
     }
 }

@@ -256,10 +256,13 @@ public class Logic {
 
     /**
      * Creates or updates search document for the given instructor.
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws URISyntaxException
      *
      * @see InstructorsLogic#putDocument(InstructorAttributes)
      */
-    public void putInstructorDocument(InstructorAttributes instructor) throws SearchServiceException {
+    public void putInstructorDocument(InstructorAttributes instructor) throws SearchServiceException, URISyntaxException, IOException, InterruptedException {
         instructorsLogic.putDocument(instructor);
     }
 
@@ -466,8 +469,11 @@ public class Logic {
     /**
      * Preconditions: <br>
      * * All parameters are non-null.
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws URISyntaxException
      */
-    public List<CourseAttributes> getCoursesForStudentAccount(String googleId) {
+    public List<CourseAttributes> getCoursesForStudentAccount(String googleId) throws URISyntaxException, IOException, InterruptedException {
         assert googleId != null;
         return coursesLogic.getCoursesForStudentAccount(googleId);
     }
@@ -477,8 +483,11 @@ public class Logic {
      * * All parameters are non-null.
      *
      * @return Courses the given instructors is in except for courses in Recycle Bin.
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws URISyntaxException
      */
-    public List<CourseAttributes> getCoursesForInstructor(List<InstructorAttributes> instructorList) {
+    public List<CourseAttributes> getCoursesForInstructor(List<InstructorAttributes> instructorList) throws URISyntaxException, IOException, InterruptedException {
 
         assert instructorList != null;
         return coursesLogic.getCoursesForInstructor(instructorList);
@@ -489,8 +498,11 @@ public class Logic {
      * * All parameters are non-null.
      *
      * @return Courses in Recycle Bin that the given instructors is in.
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws URISyntaxException
      */
-    public List<CourseAttributes> getSoftDeletedCoursesForInstructors(List<InstructorAttributes> instructorList) {
+    public List<CourseAttributes> getSoftDeletedCoursesForInstructors(List<InstructorAttributes> instructorList) throws URISyntaxException, IOException, InterruptedException {
 
         assert instructorList != null;
         return coursesLogic.getSoftDeletedCoursesForInstructors(instructorList);
@@ -906,10 +918,13 @@ public class Logic {
 
     /**
      * Creates or updates search document for the given student.
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws URISyntaxException
      *
      * @see StudentsLogic#putDocument(StudentAttributes)
      */
-    public void putStudentDocument(StudentAttributes student) throws SearchServiceException {
+    public void putStudentDocument(StudentAttributes student) throws SearchServiceException, URISyntaxException, IOException, InterruptedException {
         studentsLogic.putDocument(student);
     }
 
@@ -1481,10 +1496,13 @@ public class Logic {
 
     /**
      * Puts searchable documents from the data bundle to the database.
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws URISyntaxException
      *
      * @see DataBundleLogic#putDocuments(DataBundle)
      */
-    public void putDocuments(DataBundle dataBundle) throws SearchServiceException {
+    public void putDocuments(DataBundle dataBundle) throws SearchServiceException, URISyntaxException, IOException, InterruptedException {
         dataBundleLogic.putDocuments(dataBundle);
     }
 
@@ -1600,10 +1618,13 @@ public class Logic {
 
     /**
      * Creates or updates search document for the given account request.
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws URISyntaxException
      *
      * @see AccountRequestsLogic#putDocument(AccountRequestAttributes)
      */
-    public void putAccountRequestDocument(AccountRequestAttributes accountRequest) throws SearchServiceException {
+    public void putAccountRequestDocument(AccountRequestAttributes accountRequest) throws SearchServiceException, URISyntaxException, IOException, InterruptedException {
         accountRequestsLogic.putDocument(accountRequest);
     }
 

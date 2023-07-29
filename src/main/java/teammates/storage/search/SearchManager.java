@@ -2,6 +2,7 @@ package teammates.storage.search;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -100,12 +101,15 @@ abstract class SearchManager<T extends EntityAttributes<?>> {
 
     abstract String getCollectionName();
 
-    abstract SearchDocument<T> createDocument(T attribute);
+    abstract SearchDocument<T> createDocument(T attribute) throws URISyntaxException, IOException, InterruptedException;
 
     /**
      * Creates or updates search document for the given entity.
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws URISyntaxException
      */
-    public void putDocument(T attributes) throws SearchServiceException {
+    public void putDocument(T attributes) throws SearchServiceException, URISyntaxException, IOException, InterruptedException {
         if (client == null) {
             log.warning(ERROR_SEARCH_NOT_IMPLEMENTED);
             return;

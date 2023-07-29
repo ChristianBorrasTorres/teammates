@@ -1,5 +1,7 @@
 package teammates.logic.core;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -60,8 +62,11 @@ public final class InstructorsLogic {
      * Creates or updates search document for the given instructor.
      *
      * @param instructor the instructor to be put into documents
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws URISyntaxException
      */
-    public void putDocument(InstructorAttributes instructor) throws SearchServiceException {
+    public void putDocument(InstructorAttributes instructor) throws SearchServiceException, URISyntaxException, IOException, InterruptedException {
         instructorsDb.putDocument(instructor);
     }
 

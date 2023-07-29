@@ -2,6 +2,8 @@ package teammates.storage.api;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,8 +56,11 @@ public final class StudentsDb extends EntitiesDb<CourseStudent, StudentAttribute
 
     /**
      * Creates or updates search document for the given student.
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws URISyntaxException
      */
-    public void putDocument(StudentAttributes student) throws SearchServiceException {
+    public void putDocument(StudentAttributes student) throws SearchServiceException, URISyntaxException, IOException, InterruptedException {
         getSearchManager().putDocument(student);
     }
 

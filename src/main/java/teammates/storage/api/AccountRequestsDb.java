@@ -2,6 +2,8 @@ package teammates.storage.api;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,8 +45,11 @@ public final class AccountRequestsDb extends EntitiesDb<AccountRequest, AccountR
 
     /**
      * Creates or updates search document for the given account request.
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws URISyntaxException
      */
-    public void putDocument(AccountRequestAttributes accountRequest) throws SearchServiceException {
+    public void putDocument(AccountRequestAttributes accountRequest) throws SearchServiceException, URISyntaxException, IOException, InterruptedException {
         getSearchManager().putDocument(accountRequest);
     }
 

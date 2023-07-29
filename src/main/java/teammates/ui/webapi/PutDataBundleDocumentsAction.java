@@ -1,5 +1,8 @@
 package teammates.ui.webapi;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 import org.apache.http.HttpStatus;
 
 import teammates.common.datatransfer.DataBundle;
@@ -25,7 +28,7 @@ class PutDataBundleDocumentsAction extends Action {
     }
 
     @Override
-    public JsonResult execute() {
+    public JsonResult execute() throws URISyntaxException, IOException, InterruptedException {
         DataBundle dataBundle = JsonUtils.fromJson(getRequestBody(), DataBundle.class);
         try {
             logic.putDocuments(dataBundle);

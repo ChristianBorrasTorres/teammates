@@ -2,6 +2,8 @@ package teammates.storage.api;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,8 +52,11 @@ public final class InstructorsDb extends EntitiesDb<Instructor, InstructorAttrib
 
     /**
      * Creates or updates search document for the given instructor.
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws URISyntaxException
      */
-    public void putDocument(InstructorAttributes instructor) throws SearchServiceException {
+    public void putDocument(InstructorAttributes instructor) throws SearchServiceException, URISyntaxException, IOException, InterruptedException {
         getSearchManager().putDocument(instructor);
     }
 
@@ -348,7 +353,7 @@ public final class InstructorsDb extends EntitiesDb<Instructor, InstructorAttrib
 
     private Instructor getInstructorEntityForGoogleId(String courseId, String googleId) {
         return getInstructorsForGoogleIdQuery(googleId)
-                //.filter("courseId =", courseId)
+                .filter("courseId =", courseId)
                 .first().now();
     }
 

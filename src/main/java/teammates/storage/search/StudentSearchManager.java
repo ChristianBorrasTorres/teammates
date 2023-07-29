@@ -1,5 +1,7 @@
 package teammates.storage.search;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -14,7 +16,7 @@ import teammates.common.datatransfer.attributes.CourseAttributes;
 import teammates.common.datatransfer.attributes.InstructorAttributes;
 import teammates.common.datatransfer.attributes.StudentAttributes;
 import teammates.common.exception.SearchServiceException;
-import teammates.storage.api.CoursesDb;
+import teammates.logic.core.CoursesLogic;
 import teammates.storage.api.StudentsDb;
 
 /**
@@ -22,7 +24,7 @@ import teammates.storage.api.StudentsDb;
  */
 public class StudentSearchManager extends SearchManager<StudentAttributes> {
 
-    private final CoursesDb coursesDb = CoursesDb.inst();
+    final CoursesLogic coursesLogic = CoursesLogic.inst();
     private final StudentsDb studentsDb = StudentsDb.inst();
 
     public StudentSearchManager(String searchServiceHost, boolean isResetAllowed) {
@@ -35,8 +37,8 @@ public class StudentSearchManager extends SearchManager<StudentAttributes> {
     }
 
     @Override
-    StudentSearchDocument createDocument(StudentAttributes student) {
-        CourseAttributes course = coursesDb.getCourse(student.getCourse());
+    StudentSearchDocument createDocument(StudentAttributes student) throws URISyntaxException, IOException, InterruptedException {
+        CourseAttributes course = coursesLogic.getCourse(student.getCourse());
         return new StudentSearchDocument(student, course);
     }
 

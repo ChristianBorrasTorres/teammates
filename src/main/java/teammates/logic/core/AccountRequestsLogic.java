@@ -1,5 +1,7 @@
 package teammates.logic.core;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.List;
 
@@ -86,8 +88,11 @@ public final class AccountRequestsLogic {
      * Creates or updates search document for the given account request.
      *
      * @param accountRequest the account request to be put into documents
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws URISyntaxException
      */
-    public void putDocument(AccountRequestAttributes accountRequest) throws SearchServiceException {
+    public void putDocument(AccountRequestAttributes accountRequest) throws SearchServiceException, URISyntaxException, IOException, InterruptedException {
         accountRequestsDb.putDocument(accountRequest);
     }
 

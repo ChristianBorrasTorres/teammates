@@ -1,5 +1,8 @@
 package teammates.ui.webapi;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 import org.apache.http.HttpStatus;
 
 import teammates.common.datatransfer.attributes.StudentAttributes;
@@ -12,7 +15,7 @@ import teammates.common.util.Const.ParamsNames;
 public class StudentSearchIndexingWorkerAction extends AdminOnlyAction {
 
     @Override
-    public ActionResult execute() {
+    public ActionResult execute() throws URISyntaxException, IOException, InterruptedException {
         String courseId = getNonNullRequestParamValue(ParamsNames.COURSE_ID);
         String email = getNonNullRequestParamValue(ParamsNames.STUDENT_EMAIL);
 

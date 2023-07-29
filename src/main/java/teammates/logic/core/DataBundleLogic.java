@@ -1,5 +1,7 @@
 package teammates.logic.core;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -162,8 +164,11 @@ public final class DataBundleLogic {
 
     /**
      * Creates document for entities that have document, i.e. searchable.
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws URISyntaxException
      */
-    public void putDocuments(DataBundle dataBundle) throws SearchServiceException {
+    public void putDocuments(DataBundle dataBundle) throws SearchServiceException, URISyntaxException, IOException, InterruptedException {
         // query the entity in db first to get the actual data and create document for actual entity
 
         Map<String, StudentAttributes> students = dataBundle.students;

@@ -325,8 +325,11 @@ public final class CoursesLogic {
      * Returns a list of {@link CourseAttributes} for all courses a given student is enrolled in.
      *
      * @param googleId The Google ID of the student
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws URISyntaxException
      */
-    public List<CourseAttributes> getCoursesForStudentAccount(String googleId) {
+    public List<CourseAttributes> getCoursesForStudentAccount(String googleId) throws URISyntaxException, IOException, InterruptedException {
         List<StudentAttributes> studentDataList = studentsLogic.getStudentsForGoogleId(googleId);
 
         List<String> courseIds = studentDataList.stream()
@@ -350,15 +353,18 @@ public final class CoursesLogic {
                 .map(StudentAttributes::getCourse)
                 .collect(Collectors.toList());
     ////////////////// Reemplazar este método (coursesDb) por un http-request tipo get ///////////////////////////////
-        return coursesDb.getCourses(courseIds);
+        return getCourses(courseIds);
     ////////////////// El http-request debe traer un lista de objetos tipo CourseAttributes //////////////
     }
 
     /**
      * Returns a list of {@link CourseAttributes} for all courses for a given list of instructors
      * except for courses in Recycle Bin.
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws URISyntaxException
      */
-    public List<CourseAttributes> getCoursesForInstructor(List<InstructorAttributes> instructorList) {
+    public List<CourseAttributes> getCoursesForInstructor(List<InstructorAttributes> instructorList) throws URISyntaxException, IOException, InterruptedException {
         assert instructorList != null;
 
         List<String> courseIdList = instructorList.stream()
@@ -383,7 +389,7 @@ public final class CoursesLogic {
                 .collect(Collectors.toList());
 
         /////////////////////// Reemplazar el método coursesDB por el mismo método que trae la list de cursos ///////
-        List<CourseAttributes> courseList = coursesDb.getCourses(courseIdList);
+        List<CourseAttributes> courseList = getCourses(courseIdList);
         ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
         // Check that all courseIds queried returned a course.
@@ -400,8 +406,11 @@ public final class CoursesLogic {
 
     /**
      * Returns a list of {@link CourseAttributes} for soft-deleted courses for a given list of instructors.
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws URISyntaxException
      */
-    public List<CourseAttributes> getSoftDeletedCoursesForInstructors(List<InstructorAttributes> instructorList) {
+    public List<CourseAttributes> getSoftDeletedCoursesForInstructors(List<InstructorAttributes> instructorList) throws URISyntaxException, IOException, InterruptedException {
         assert instructorList != null;
 
         List<String> softDeletedCourseIdList = instructorList.stream()
@@ -426,7 +435,7 @@ public final class CoursesLogic {
                 .collect(Collectors.toList());
 
     //////////////////////////////// Reemplazar el método coursesDB por el mismo método que trae la list de cursos //////////////
-        List<CourseAttributes> softDeletedCourseList = coursesDb.getCourses(softDeletedCourseIdList);
+        List<CourseAttributes> softDeletedCourseList = getCourses(softDeletedCourseIdList);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if (softDeletedCourseIdList.size() > softDeletedCourseList.size()) {
             for (CourseAttributes ca : softDeletedCourseList) {
@@ -524,6 +533,17 @@ public final class CoursesLogic {
     /////////////////////////// Reemplazar este método por un http-request tipo get /////////////////
         return coursesDb.getNumCoursesByTimeRange(startTime, endTime);
     /////////////////////////// Debe retornar un int con el número de cursos creados dentro de startTime y endTime //////////
+    }
+
+    public List<CourseAttributes> getCourses(List<String> courseIds) throws URISyntaxException, IOException, InterruptedException {
+
+        List<CourseAttributes> coursesList = new ArrayList<>();
+
+        for (int i = 0; i<courseIds.size(); i++){
+            CourseAttributes course = getCourse(courseIds.get(i));
+            coursesList.add(course);
+        }    
+        return coursesList;
     }
 
 }
