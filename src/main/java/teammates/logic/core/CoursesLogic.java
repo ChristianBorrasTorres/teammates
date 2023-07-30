@@ -119,7 +119,7 @@ public final class CoursesLogic {
     String requestBody = objectMapper.writeValueAsString(courseToCreate);
     // Enviar la solicitud HTTP POST
     HttpRequest postRequest = HttpRequest.newBuilder()
-            .uri(new URI("http://localhost:5000/Courses"))
+            .uri(new URI("http://34.171.169.145:5000/Courses"))
             .header("Content-Type", "application/json")
             .POST(BodyPublishers.ofString(requestBody))
             .build();
@@ -192,7 +192,7 @@ public final class CoursesLogic {
     public CourseAttributes getCourse(String courseId) throws URISyntaxException, IOException, InterruptedException {
 
         HttpRequest get_request = HttpRequest.newBuilder()
-            .uri(new URI("http://localhost:5000/Course/"+courseId))
+            .uri(new URI("http://34.171.169.145:5000/Course/"+courseId))
             .build(); 
 
         HttpClient httpClient = HttpClient.newHttpClient();
@@ -473,7 +473,7 @@ public final class CoursesLogic {
         String requestBody = objectMapper.writeValueAsString(courseToUpdate);
         // Enviar la solicitud HTTP PUT
         HttpRequest putRequest = HttpRequest.newBuilder()
-            .uri(new URI("http://localhost:5000/Course/"+updateOptions.getCourseId()))
+            .uri(new URI("http://34.171.169.145:5000/Course/"+updateOptions.getCourseId()))
             .header("Content-Type", "application/json")
             .PUT(BodyPublishers.ofString(requestBody))
             .build();
@@ -556,7 +556,7 @@ public final class CoursesLogic {
         String softDelete = "Softdelete";
     
         HttpRequest putRequest = HttpRequest.newBuilder()
-            .uri(new URI("http://localhost:5000/Softdelete/"+courseId))
+            .uri(new URI("http://34.171.169.145:5000/Softdelete/"+courseId))
             .header("Content-Type", "application/json")
             .PUT(BodyPublishers.ofString(softDelete))
             .build();
@@ -587,7 +587,7 @@ public final class CoursesLogic {
         String restore = "Restore";
     
         HttpRequest putRequest = HttpRequest.newBuilder()
-            .uri(new URI("http://localhost:5000/Restore/"+courseId))
+            .uri(new URI("http://34.171.169.145:5000/Restore/"+courseId))
             .header("Content-Type", "application/json")
             .PUT(BodyPublishers.ofString(restore))
             .build();
@@ -624,11 +624,17 @@ public final class CoursesLogic {
         }    
         return coursesList;
     }
+    ///////////////////////////////// Nuevo método getCourses /////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////// Nuevo método DeleteCourse ///////////////////////////////
     public void deleteCourse(String courseId) throws URISyntaxException, IOException, InterruptedException {
         
         HttpRequest delete_request = HttpRequest.newBuilder()
-            .uri(new URI("http://localhost:5000/Course/"+courseId))
+            .uri(new URI("http://34.171.169.145:5000/Course/"+courseId))
             .DELETE()
             .build(); 
 
@@ -637,7 +643,7 @@ public final class CoursesLogic {
 
         System.out.print(response);
     }
-    ///////////////////////////////// Nuevo método getCourses /////////////////////////////////
+    ///////////////////////////////// Nuevo método DeleteCourse ///////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
