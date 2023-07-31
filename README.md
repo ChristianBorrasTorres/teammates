@@ -4,7 +4,7 @@ Esta es la versión actualizada de la aplicación Teammates para el experimento 
 
 # Setup
 El setup del entorno de desarrollo de Teammates es bastante complejo, pero existe una guía con instrucciones detalladas que se pueden encontrar aquí:
-[https://teammates.github.io/teammates/setting-up.html]
+https://teammates.github.io/teammates/setting-up.html
 
 # Integrantes Grupo 1:
 * ZARAY VIVIANA REY VIVIESCAS
