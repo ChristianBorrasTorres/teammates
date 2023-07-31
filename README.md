@@ -1,3 +1,18 @@
+# Aplicación legado: Teammates
+Esta es la versión actualizada de la aplicación Teammates para el experimento de modernización. Se realizaron cambios en varios archivos, sin embargo, en casi todos los casos se trató de incluir excepciones necesarias por la implementación de peticiones HTTP en el archivo CourseLogic.java. La clase CourseLogic fue la única clase en la que se hicierion cambios significativos en cuanto al funcionamiento de la aplicación, ya que esta se encarga de la comunicación con el nuevo microservicio [Courses](https://github.com/DaMoAndes/Modernizacion_entregafinal). Dentro del archivo CoursesLogic.java se resaltaron los cambios realizados a través de comentarios:
+
+# Setup
+El setup del entorno de desarrollo de Teammates es bastante complejo, pero existe una guía con instrucciones detalladas que se pueden encontrar aquí:
+[https://teammates.github.io/teammates/setting-up.html]
+
+# Integrantes Grupo 1:
+* ZARAY VIVIANA REY VIVIESCAS
+* CHRISTIAN BORRÁS TORRES
+* DAVID MORALES AGUILAR
+* PATRICK MYKODA
+
+A continuación se muestra la documentación de la versión orignal:
+
 # TEAMMATES Developer Web Site
 
 [![GitHub Actions Build Status Component Tests](https://github.com/TEAMMATES/teammates/workflows/Component%20Tests/badge.svg)](https://github.com/TEAMMATES/teammates/actions)
